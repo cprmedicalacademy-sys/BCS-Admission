@@ -104,7 +104,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
   const totalCount = candidates.length;
   const confirmedCount = candidates.filter((c) => c.status === 'Confirmed').length;
   const pendingCount = totalCount - confirmedCount;
-  const totalRevenue = candidates.reduce((sum, c) => sum + (c.amount || 1199), 0);
+  const totalRevenue = candidates.reduce((sum, c) => sum + (c.amount || 1499), 0);
   const bkashCount = candidates.filter(
     (c) => c.paymentMethod === 'bKash (Online)' || (c.paymentMethod as string) === 'bKash'
   ).length;
@@ -147,7 +147,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
       c.transactionId || '',
       c.senderNumber || '',
       c.cashReceivedBy || '',
-      c.amount || 1199,
+      c.amount || 1499,
       c.registrationDate || '',
       c.status || 'Confirmed'
     ]);
@@ -327,7 +327,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                   ৳ {totalRevenue.toLocaleString()}
                 </div>
                 <div className="text-[10px] text-blue-700 mt-0.5">
-                  @ ৳ 1199 per head
+                  @ ৳ 1499 per head
                 </div>
               </div>
             </div>
@@ -501,7 +501,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                                   {isBkash ? 'bKash' : 'Cash'}
                                 </span>
                                 <span className="font-bold text-slate-900 font-mono">
-                                  ৳ {candidate.amount || 1199}
+                                  ৳ {candidate.amount || 1499}
                                 </span>
                               </div>
 

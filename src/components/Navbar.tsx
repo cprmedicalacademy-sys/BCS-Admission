@@ -18,7 +18,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onRegisterClick, onLookupClick, 
         <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-cyan-300 font-semibold tracking-wide">SPECIAL BCS:</span>
-            <span>মূল পরীক্ষা ফি ৳ ১৪৯৯ · ১ম ২০ জন কে ৳ ১১৯৯ টাকায় ভর্তি</span>
+            <span>মূল পরীক্ষা ফি ৳ ১৪৯৯ · ইতিমধ্যে ৫৪ জন ভর্তি সম্পন্ন</span>
             <span className="hidden sm:inline text-sky-200">· চকবাজার, চট্টগ্রাম ও অনলাইন</span>
           </div>
           <div className="hidden md:flex items-center gap-3 text-slate-300">
@@ -115,8 +115,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onRegisterClick, onLookupClick, 
           >
             <span className="relative z-10 flex items-center gap-1.5">
               <span>Register Now</span>
-              <span className="bg-red-500/90 text-white text-[11px] font-bold px-1.5 py-0.2 rounded">
-                ৳ 1199
+              <span className="bg-red-500/90 text-white text-[11px] font-bold px-1.5 py-0.2 rounded font-mono-numbers">
+                ৳ ১৪৯৯
               </span>
             </span>
           </button>
@@ -202,7 +202,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onRegisterClick, onLookupClick, 
               }}
               className="w-full py-3 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-800 text-white font-bold text-center text-sm shadow-md"
             >
-              Register Online · ৳ 1199 Only
+              Register Online · ৳ ১৪৯৯
             </button>
             <a
               href="tel:01898938981"

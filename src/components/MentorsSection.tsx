@@ -105,7 +105,7 @@ export const MentorsSection: React.FC<MentorsSectionProps> = ({ onRegisterClick 
                 onClick={onRegisterClick}
                 className="px-6 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs shadow-md transition-all duration-200 cursor-pointer flex items-center gap-1.5"
               >
-                <span>Enroll in Winter Batch (৳ 1199)</span>
+                <span>Enroll in Batch (৳ ১৪৯৯)</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -153,7 +153,7 @@ export const MentorsSection: React.FC<MentorsSectionProps> = ({ onRegisterClick 
                   }}
                   className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs cursor-pointer shadow-md"
                 >
-                  Register Now (৳ 1199)
+                  Register Now (৳ ১৪৯৯)
                 </button>
               </div>
             </div>

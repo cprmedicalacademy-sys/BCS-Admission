@@ -188,7 +188,7 @@ export const ExamSchedule: React.FC<ExamScheduleProps> = ({ onRegisterClick }) =
                 onClick={onRegisterClick}
                 className="text-red-700 hover:text-red-800 font-bold flex items-center gap-1 cursor-pointer"
               >
-                <span>ভর্তি ফি ৳১১৯৯ (১ম ২০ জন)</span>
+                <span>মূল ভর্তি ফি ৳১৪৯৯ (ইতিমধ্যে ৫৪ জন ভর্তি)</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -235,7 +235,7 @@ export const ExamSchedule: React.FC<ExamScheduleProps> = ({ onRegisterClick }) =
                   }}
                   className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs cursor-pointer shadow-md"
                 >
-                  Register Now (৳ 1199)
+                  Register Now (৳ ১৪৯৯)
                 </button>
               </div>
             </div>

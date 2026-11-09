@@ -5,13 +5,15 @@ export const CAMPAIGN_INFO = {
   centerTitle: "Centre for Post-Graduation (CPR)",
   taglineBengali: "চট্টগ্রামে একমাত্র অফলাইন মেডিকেল পোস্ট গ্রাজুয়েশন ওরিয়েন্টেশন সেন্টার",
   slogan: "Special BCS (Health) Subject Finals & Grand Mock",
-  campaignTitle: "WINTER SALE – SPECIAL BCS",
+  campaignTitle: "SPECIAL BCS – CPR MEDICAL ACADEMY",
   campaignSubtitle: "SUBJECT FINALS & GRAND MOCK",
   regularPrice: 1499,
-  offerPrice: 1199,
-  discountSavings: 300,
-  maxSeats: 20, // ১ম ২০ জন কে ১১৯৯ টাকায় ভর্তি নেওয়া হবে
-  claimedSeats: 14,
+  offerPrice: 1499,
+  coursePrice: 1499,
+  discountSavings: 0,
+  enrolledCount: 54, // ইতিমধ্যে ৫৪ জন ভর্তি সম্পন্ন
+  maxSeats: 100,
+  claimedSeats: 54,
   examTime: "3:00 PM",
   bkashNumber: "+880 1675-226753",
   bkashRawNumber: "01675226753",
@@ -30,12 +32,12 @@ export const PAYMENT_CHANNELS = {
     title: "Online Payment (bKash Send Money)",
     type: "bKash Personal",
     number: "01675-226753",
-    instructions: "bKash অ্যাপ বা *247# ডায়াল করে Send Money করুন: 01675226753 নম্বরে। পরিমাণ ৳ ১১৯৯, রেফারেন্স: BCS। সেন্ড মানির পর Transaction ID (TrxID) ইনপুট দিন।"
+    instructions: "bKash অ্যাপ বা *247# ডায়াল করে Send Money করুন: 01675226753 নম্বরে। পরিমাণ ৳ ১৪৯৯, রেফারেন্স: BCS। সেন্ড মানির পর Transaction ID (TrxID) ইনপুট দিন।"
   },
   cash: {
     title: "Cash Payment (ক্যাশ পেমেন্ট)",
     type: "অফলাইন চকবাজার ক্যাম্পাস / প্রতিনিধি",
-    instructions: "আমাদের মতি টাওয়ার, চকবাজার অফিসে বা আমাদের কোনো প্রতিনিধির নিকট সরাসরি ক্যাশ টাকা দিয়ে থাকলে, যিনি টাকা গ্রহণ করেছেন তার নাম লিখুন।"
+    instructions: "আমাদের মতি টাওয়ার, চকবাজার অফিসে বা আমাদের কোনো প্রতিনিধির নিকট সরাসরি ক্যাশ টাকা (৳ ১৪৯৯) জমা দিয়ে থাকলে, যিনি টাকা গ্রহণ করেছেন তার নাম লিখুন।"
   }
 };
 
@@ -324,7 +326,7 @@ export const SEEDED_CANDIDATES: RegistrationFormData[] = [
     paymentMethod: "bKash (Online)",
     senderNumber: "01711223344",
     transactionId: "BK9X7281Q",
-    amount: 1199,
+    amount: 1499,
     registrationId: "CPR-W24-0012",
     rollNumber: "241012",
     registrationDate: "2026-11-06",
@@ -344,7 +346,7 @@ export const SEEDED_CANDIDATES: RegistrationFormData[] = [
     examMode: "Offline Campus (Chittagong Center)",
     paymentMethod: "Cash (Campus / Offline)",
     cashReceivedBy: "Dr. Md. Saimul Islam",
-    amount: 1199,
+    amount: 1499,
     registrationId: "CPR-W24-0018",
     rollNumber: "241018",
     registrationDate: "2026-11-07",

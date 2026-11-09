@@ -117,7 +117,7 @@ export const CourseHighlights: React.FC<CourseHighlightsProps> = ({ onRegisterCl
             <div className="relative z-10 pt-6 mt-6 border-t border-white/10 flex items-center justify-between">
               <div>
                 <div className="text-xs text-slate-400">Batch Registration Fee</div>
-                <div className="text-xl font-bold text-cyan-400 font-mono-numbers">৳ 1199 (All Inclusive)</div>
+                <div className="text-xl font-bold text-cyan-400 font-mono-numbers">৳ ১৪৯৯ (মূল ভর্তি ফি)</div>
               </div>
               <button
                 onClick={onRegisterClick}
@@ -180,7 +180,7 @@ export const CourseHighlights: React.FC<CourseHighlightsProps> = ({ onRegisterCl
               Ready to Secure Your Name on the Special BCS Cadre Merit List?
             </div>
             <div className="text-xs sm:text-sm text-slate-300 max-w-xl">
-              মূল পরীক্ষা ফি ৳ ১৪৯৯, কিন্তু ১ম ২০ জন প্রার্থীর জন্য বিশেষ ছাড় ৳ ১১৯৯ টাকা। Instant admission slip generated upon bKash verification.
+              মূল পরীক্ষা ও ভর্তি ফি ৳ ১৪৯৯/-। ইতিমধ্যে ৫৪ জন সম্মানিত ডাক্তার সফলভাবে ভর্তি সম্পন্ন করেছেন।
             </div>
           </div>
 
@@ -189,7 +189,7 @@ export const CourseHighlights: React.FC<CourseHighlightsProps> = ({ onRegisterCl
             className="shrink-0 px-8 py-3.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-sm shadow-md transition-all duration-200 hover:-translate-y-0.5 cursor-pointer flex items-center gap-2 whitespace-nowrap"
           >
             <span>APPLY FOR ADMISSION</span>
-            <span className="text-xs font-mono-numbers bg-red-800 px-2 py-0.5 rounded">৳ 1199</span>
+            <span className="text-xs font-mono-numbers bg-red-800 px-2 py-0.5 rounded">৳ ১৪৯৯</span>
           </button>
         </div>
 

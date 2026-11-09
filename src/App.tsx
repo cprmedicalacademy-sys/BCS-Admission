@@ -165,11 +165,11 @@ export default function App() {
       {/* Mobile Floating Sticky CTA (respecting 15% mobile sticky cap per §1.I) */}
       <aside aria-label="Quick Registration" className="lg:hidden fixed bottom-0 left-0 right-0 z-30 p-2.5 bg-white/95 backdrop-blur-md border-t border-sky-100 shadow-xl flex items-center justify-between gap-3 no-print">
         <div className="pl-1">
-          <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
-            Special BCS (১ম ২০ জন)
+          <div className="text-[10px] text-emerald-800 font-bold uppercase tracking-wider">
+            Special BCS (৫৪ জন ভর্তি)
           </div>
           <div className="text-sm font-black text-blue-950 font-mono-numbers">
-            ৳ 1199 <span className="text-[10px] text-slate-400 line-through font-normal">৳1499</span>
+            ৳ ১৪৯৯/-
           </div>
         </div>
 
@@ -177,7 +177,7 @@ export default function App() {
           onClick={handleRegisterClick}
           className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold text-xs shadow-md transition-all duration-200 active:scale-95 cursor-pointer whitespace-nowrap"
         >
-          Register Now · ৳1199
+          Register Now · ৳১৪৯৯
         </button>
       </aside>
 

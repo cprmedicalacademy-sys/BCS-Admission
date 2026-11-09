@@ -18,8 +18,8 @@ export const FAQSection: React.FC = () => {
       a: "Yes, absolutely! The exam portal is mobile-optimized and accessible from all 64 districts. Tests remain open for 24 hours on exam days so doctors on hospital duty or emergency shifts can sit at their convenient time."
     },
     {
-      q: "What does the ৳ 1199 Winter Sale package include?",
-      a: "The subsidized ৳ 1199 package covers 10 Subject Final Examinations, 5 Full-length Grand Mocks (200 marks each), digital question explanation booklets with rationale, All-Bangladesh Merit Ranking, and direct admission into the official WhatsApp cadre guidance group."
+      q: "What does the ৳ 1499 admission package include?",
+      a: "The all-inclusive ৳ 1499 package covers 8 Subject Final Examinations, 2 Full-length Grand Mocks (200 marks each, 3:00 PM), complete question explanation booklets with rationale, All-Bangladesh Merit Ranking, and direct admission into the official WhatsApp cadre guidance group."
     },
     {
       q: "How soon do I receive my Roll Number and batch access?",

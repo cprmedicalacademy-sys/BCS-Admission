@@ -11,9 +11,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   onRegisterClick,
   onExploreRoutineClick,
 }) => {
-  const seatsLeft = CAMPAIGN_INFO.maxSeats - CAMPAIGN_INFO.claimedSeats;
-  const progressPercent = Math.round((CAMPAIGN_INFO.claimedSeats / CAMPAIGN_INFO.maxSeats) * 100);
-
   return (
     <section id="home" className="relative overflow-hidden pt-6 pb-16 md:py-16 bg-gradient-to-b from-sky-50/70 via-cyan-50/30 to-white">
       {/* Subtle Winter Ambient Accents */}
@@ -39,18 +36,15 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           {/* Left Column: Marquee Campaign Content */}
           <div className="lg:col-span-7 space-y-6">
             
-            {/* Winter Campaign Kicker */}
+            {/* Campaign Kicker */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-sky-100/90 to-cyan-100/90 border border-cyan-300/60 shadow-xs text-slate-800 text-xs sm:text-sm font-semibold">
               <span className="flex items-center gap-1 text-cyan-700">
                 <Snowflake className="w-4 h-4 text-cyan-600 animate-spin-slow" />
-                <span>WINTER SALE</span>
+                <span>SPECIAL BCS (HEALTH)</span>
               </span>
               <span className="text-slate-400">·</span>
               <span className="text-blue-900 font-bold uppercase tracking-wide">
-                Special BCS (Health)
-              </span>
-              <span className="hidden sm:inline bg-red-600 text-white text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full">
-                40% OFF
+                SUBJECT FINALS &amp; GRAND MOCK
               </span>
             </div>
 
@@ -67,55 +61,51 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               </p>
             </div>
 
-            {/* Special Price Lockup Box */}
+            {/* Price Lockup Box (Regular Price 1499, 54 Enrolled) */}
             <div className="p-5 sm:p-6 rounded-2xl bg-white/95 border border-sky-100 shadow-[0_10px_30px_-5px_rgba(15,23,42,0.06)] relative overflow-hidden backdrop-blur-sm">
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-cyan-100/60 to-transparent rounded-bl-full pointer-events-none" />
               
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
                 <div>
-                  <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                    Special Admission Offer (১ম ২০ জন)
+                  <div className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                    মূল পরীক্ষা ও ভর্তি ফি (Regular Admission Fee)
                   </div>
                   <div className="flex items-baseline gap-3 mt-1">
-                    <span className="text-3xl sm:text-4xl font-extrabold font-display text-slate-900 text-cyan-900 font-mono-numbers">
-                      ৳ 1199/-
+                    <span className="text-3xl sm:text-4xl font-extrabold font-display text-blue-950 font-mono-numbers">
+                      ৳ ১৪৯৯/-
                     </span>
-                    <span className="text-base sm:text-lg text-slate-400 line-through font-mono-numbers">
-                      ৳ 1499/-
-                    </span>
-                    <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-md">
-                      SAVE ৳ 300
+                    <span className="text-xs font-bold text-slate-600 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-md">
+                      ১০টি পরীক্ষা অল-ইনক্লুসিভ
                     </span>
                   </div>
                 </div>
 
-                {/* Quota Badge */}
+                {/* Already Enrolled 54 Badge */}
                 <div className="sm:text-right">
-                  <div className="inline-flex items-center gap-1.5 text-xs font-bold text-red-600 bg-red-50 border border-red-200 px-2.5 py-1 rounded-md">
-                    <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-                    <span>Special Offer: First 20 Candidates Only</span>
+                  <div className="inline-flex items-center gap-2 text-xs font-bold text-emerald-900 bg-emerald-50 border border-emerald-300 px-3 py-1.5 rounded-lg shadow-xs">
+                    <Users className="w-4 h-4 text-emerald-600" />
+                    <span>ইতিমধ্যে ৫৪ জন ভর্তি সম্পন্ন</span>
                   </div>
-                  <div className="text-xs text-slate-500 mt-1 font-mono-numbers">
-                    মূল ফি ৳ ১৪৯৯ (১ম ২০ জন ৳ ১১৯৯)
+                  <div className="text-xs text-slate-500 mt-1">
+                    চকবাজার মতি টাওয়ার ক্যাম্পাস, চট্টগ্রাম
                   </div>
                 </div>
               </div>
 
-              {/* Real-time Seats Progress */}
+              {/* Real-time Enrolled Status */}
               <div className="pt-3 space-y-1.5">
-                <div className="flex justify-between items-center text-xs font-medium text-slate-600 font-mono-numbers">
-                  <span className="flex items-center gap-1">
-                    <Users className="w-3.5 h-3.5 text-cyan-600" />
-                    <span><strong>{CAMPAIGN_INFO.claimedSeats} of {CAMPAIGN_INFO.maxSeats}</strong> Subsidized Seats Claimed</span>
+                <div className="flex justify-between items-center text-xs font-medium text-slate-700 font-mono-numbers">
+                  <span className="flex items-center gap-1.5 font-bold text-slate-800">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span>ইতিমধ্যে ৫৪ জন সম্মানিত চিকিৎসক ভর্তি হয়েছেন</span>
                   </span>
-                  <span className="text-red-600 font-semibold">
-                    Only {seatsLeft} Seats Remaining at ৳ 1199!
+                  <span className="text-blue-900 font-bold">
+                    ভর্তি ফি ৳ ১৪৯৯/-
                   </span>
                 </div>
                 <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
                   <div
-                    className="bg-gradient-to-r from-cyan-500 via-blue-600 to-red-500 h-2.5 rounded-full transition-all duration-500"
-                    style={{ width: `${progressPercent}%` }}
+                    className="bg-gradient-to-r from-cyan-500 via-blue-600 to-emerald-600 h-2.5 rounded-full transition-all duration-500 w-[54%]"
                   />
                 </div>
               </div>
@@ -131,7 +121,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 <span className="flex items-center gap-2">
                   <span>REGISTER NOW</span>
                   <span className="bg-white/20 text-white text-xs px-2 py-0.5 rounded font-mono-numbers">
-                    ৳ 1199
+                    ৳ ১৪৯৯
                   </span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </span>

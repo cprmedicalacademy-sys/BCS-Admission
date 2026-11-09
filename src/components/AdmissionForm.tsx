@@ -69,6 +69,7 @@ export const AdmissionForm: React.FC<AdmissionFormProps> = ({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [copiedSlipText, setCopiedSlipText] = useState(false);
   const [completedRecord, setCompletedRecord] = useState<RegistrationFormData | null>(
     registeredCandidate || null
   );
@@ -136,7 +137,40 @@ export const AdmissionForm: React.FC<AdmissionFormProps> = ({
     }
   };
 
-  // Handle Step 2 Final Submit
+  // Format rich WhatsApp Candidate Slip message
+  const generateSlipMessage = (record: RegistrationFormData) => {
+    const paymentDetail = record.paymentMethod === 'bKash (Online)'
+      ? `বিকাশ অনলাইন (TrxID: ${record.transactionId}, প্রেরক নম্বর: ${record.senderNumber})`
+      : `ক্যাশ পেমেন্ট (টাকা গ্রহণকারী: ${record.cashReceivedBy}${record.cashReceiptNo ? `, রশিদ নং: ${record.cashReceiptNo}` : ''})`;
+
+    return `*🏥 CPR MEDICAL ACADEMY – SPECIAL BCS CANDIDATE SLIP 🏥*
+_চট্টগ্রামে একমাত্র অফলাইন মেডিকেল পোস্ট গ্রাজুয়েশন ওরিয়েন্টেশন সেন্টার_
+──────────────────────
+👤 *ক্যান্ডিডেট নাম:* Dr. ${record.fullName}
+🎫 *নির্ধারিত রোল নম্বর:* ${record.rollNumber}
+🆔 *রেজিস্ট্রেশন আইডি:* ${record.registrationId}
+📱 *প্রার্থীর হোয়াটসঅ্যাপ:* ${record.whatsappNumber}
+${record.altMobileNumber ? `📞 বিকল্প নম্বর: ${record.altMobileNumber}\n` : ''}${record.bmdcNumber ? `🩺 BMDC Reg No: ${record.bmdcNumber}\n` : '🩺 BMDC Status: Intern / Provisional\n'}🏥 *মেডিকেল কলেজ:* ${record.medicalCollege}
+🎓 *পাসের বছর:* ${record.passingYear}
+⏰ *পরীক্ষার সময়:* 3:00 PM (প্রতি পরীক্ষা বিকাল ৩:০০ টায়)
+📍 *অংশগ্রহণের ভেন্যু/মোড:* ${record.examMode}
+💳 *পেমেন্ট পদ্ধতি:* ${paymentDetail}
+💵 *জমা দেওয়া কোর্স ফি:* ৳ ${record.amount}/- (মূল ভর্তি ফি)
+📅 *আবেদনের তারিখ:* ${record.registrationDate || new Date().toISOString().split('T')[0]}
+──────────────────────
+আসসালামু আলাইকুম CPR একাডেমি কর্তৃপক্ষ,
+আমি আমার ক্যান্ডিডেট স্লিপটি পাঠালাম। অনুগ্রহ করে পেমেন্ট ও তথ্য যাচাই করে আমার সিট নিশ্চিত (Seat Confirmed) করুন। ধন্যবাদ!`;
+  };
+
+  // Pre-filled WhatsApp Confirmation URL helper
+  const getWhatsAppConfirmationUrl = (record?: RegistrationFormData | null) => {
+    const target = record || completedRecord;
+    if (!target) return '#';
+    const message = generateSlipMessage(target);
+    return `https://wa.me/88${CAMPAIGN_INFO.verificationWhatsappRaw}?text=${encodeURIComponent(message)}`;
+  };
+
+  // Handle Step 2 Final Submit with Direct WhatsApp Redirect
   const handleStep2Submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateStep2()) {
@@ -153,6 +187,15 @@ export const AdmissionForm: React.FC<AdmissionFormProps> = ({
       setCompletedRecord(newRecord);
       onSuccessfulRegistration(newRecord);
       setStep(3);
+
+      // Direct WhatsApp redirect: Immediately open WhatsApp with formatted slip to 01898-938982
+      const waUrl = getWhatsAppConfirmationUrl(newRecord);
+      try {
+        window.open(waUrl, '_blank');
+      } catch (err) {
+        console.error('Automatic WhatsApp redirect error:', err);
+      }
+
       window.scrollTo({ top: document.getElementById('admission-form-section')?.offsetTop ?? 0, behavior: 'smooth' });
     }
   };
@@ -162,30 +205,13 @@ export const AdmissionForm: React.FC<AdmissionFormProps> = ({
     window.print();
   };
 
-  // Pre-filled WhatsApp Confirmation message
-  const getWhatsAppConfirmationUrl = () => {
-    if (!completedRecord) return '#';
-    const paymentDetail = completedRecord.paymentMethod === 'bKash (Online)'
-      ? `বিকাশ অনলাইন (TrxID: ${completedRecord.transactionId}, প্রেরক নম্বর: ${completedRecord.senderNumber})`
-      : `ক্যাশ পেমেন্ট (টাকা গ্রহণকারী: ${completedRecord.cashReceivedBy})`;
-
-    const message = `আসসালামু আলাইকুম CPR Medical Academy,
-আমি স্পেশাল বিসিএস (সাবজেক্ট ফাইনাল ও গ্র্যান্ড মক) কোর্সে রেজিস্ট্রেশন করেছি।
-
-• ক্যান্ডিডেট নাম: ${completedRecord.fullName}
-• নির্ধারিত রোল নম্বর: ${completedRecord.rollNumber}
-• রেজিস্ট্রেশন আইডি: ${completedRecord.registrationId}
-• হোয়াটসঅ্যাপ নম্বর: ${completedRecord.whatsappNumber}
-• মেডিকেল কলেজ: ${completedRecord.medicalCollege}
-• বিএমডিসি রেজি: ${completedRecord.bmdcNumber || 'ইন্টার্ন / প্রযোজ্য নয়'}
-• পরীক্ষার সময়: ${completedRecord.examTime} (বিকাল ৩:০০ টা)
-• পরীক্ষার ভেন্যু/মোড: ${completedRecord.examMode}
-• পেমেন্ট মেথড: ${paymentDetail}
-• জমা দেওয়া ফি: ৳ ${completedRecord.amount}/-
-
-আমার ক্যান্ডিডেট স্লিপটি যাচাই করে আমার সিট নিশ্চিত (Seat Confirmed) করুন। ধন্যবাদ!`;
-
-    return `https://wa.me/88${CAMPAIGN_INFO.verificationWhatsappRaw}?text=${encodeURIComponent(message)}`;
+  // Helper to copy complete candidate slip text for WhatsApp
+  const handleCopyFullSlip = () => {
+    if (!completedRecord) return;
+    const text = generateSlipMessage(completedRecord);
+    navigator.clipboard.writeText(text);
+    setCopiedSlipText(true);
+    setTimeout(() => setCopiedSlipText(false), 2500);
   };
 
   return (
@@ -448,7 +474,7 @@ export const AdmissionForm: React.FC<AdmissionFormProps> = ({
                   type="submit"
                   className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-cyan-600 via-blue-700 to-slate-900 hover:from-cyan-500 hover:to-blue-800 text-white font-bold text-sm shadow-md transition-all duration-200 cursor-pointer flex items-center gap-2"
                 >
-                  <span>Proceed to Payment (৳ 1199)</span>
+                  <span>Proceed to Payment (৳ ১৪৯৯)</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -501,14 +527,14 @@ export const AdmissionForm: React.FC<AdmissionFormProps> = ({
                     </div>
                   </div>
                   <div className="text-left sm:text-right shrink-0">
-                    <div className="text-xs text-slate-400 line-through font-mono-numbers">
-                      ৳ 1499
+                    <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                      কোর্স ভর্তি ফি
                     </div>
                     <div className="text-2xl font-black text-blue-900 font-mono-numbers">
-                      ৳ 1199/-
+                      ৳ ১৪৯৯/-
                     </div>
-                    <div className="text-[11px] font-bold text-emerald-700">
-                      ১ম ২০ জনের অফার (Save ৳ 300)
+                    <div className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 mt-0.5">
+                      ইতিমধ্যে ৫৪ জন ভর্তি সম্পন্ন
                     </div>
                   </div>
                 </div>
@@ -572,7 +598,7 @@ export const AdmissionForm: React.FC<AdmissionFormProps> = ({
                         Send Money to +880 1675-226753
                       </div>
                       <div className="text-[11px] font-semibold text-pink-700 mt-1">
-                        ৳ ১১৯৯ (Send Money &amp; TrxID)
+                        ৳ ১৪৯৯ (Send Money &amp; TrxID)
                       </div>
                     </div>
                   </button>
@@ -613,7 +639,7 @@ export const AdmissionForm: React.FC<AdmissionFormProps> = ({
                     <div className="flex items-center justify-between text-xs text-pink-300 font-semibold">
                       <span>bKash Personal Send Money Instructions</span>
                       <span className="font-mono-numbers bg-slate-800 px-2.5 py-0.5 rounded border border-slate-700 text-cyan-200">
-                        Payable: ৳ 1199 (১ম ২০ জন)
+                        Payable: ৳ 1499 (মূল ভর্তি ফি)
                       </span>
                     </div>
 
@@ -647,7 +673,7 @@ export const AdmissionForm: React.FC<AdmissionFormProps> = ({
                     <div className="text-xs text-slate-300 leading-relaxed space-y-1">
                       <p>১. আপনার বিকাশ অ্যাপ ওপেন করুন অথবা *247# ডায়াল করুন।</p>
                       <p>২. <strong>Send Money</strong> সিলেক্ট করে নম্বর দিন: <strong className="text-pink-300 font-mono">01675226753</strong></p>
-                      <p>৩. টাকার পরিমাণ দিন: <strong className="text-white">1199</strong> (রেফারেন্স: <span className="text-cyan-300">BCS</span>)</p>
+                      <p>৩. টাকার পরিমাণ দিন: <strong className="text-white">1499</strong> (রেফারেন্স: <span className="text-cyan-300">BCS</span>)</p>
                       <p>৪. সফলভাবে সেন্ড মানি করার পর ফিরতি SMS-এর Transaction ID (TrxID) নিচে দিন।</p>
                     </div>
                   </div>
@@ -709,7 +735,7 @@ export const AdmissionForm: React.FC<AdmissionFormProps> = ({
                     <span>ক্যাশ পেমেন্ট ভেরিফিকেশন (Cash Received Information)</span>
                   </div>
                   <p className="text-xs text-emerald-800 leading-relaxed">
-                    চকবাজার মতি টাওয়ার ক্যাম্পাসে বা আমাদের কোনো সম্মানিত মেন্টর/প্রতিনিধির নিকট সরাসরি <strong>৳ ১১৯৯/-</strong> টাকা ক্যাশ জমা দিয়ে থাকলে যিনি টাকা গ্রহণ করেছেন তার নাম লিখুন।
+                    চকবাজার মতি টাওয়ার ক্যাম্পাসে বা আমাদের কোনো সম্মানিত মেন্টর/প্রতিনিধির নিকট সরাসরি <strong>৳ ১৪৯৯/-</strong> টাকা ক্যাশ জমা দিয়ে থাকলে যিনি টাকা গ্রহণ করেছেন তার নাম লিখুন।
                   </p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -783,10 +809,11 @@ export const AdmissionForm: React.FC<AdmissionFormProps> = ({
 
                 <button
                   type="submit"
-                  className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-700 to-blue-900 hover:from-emerald-500 hover:to-teal-600 text-white font-bold text-sm shadow-md transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-700 to-emerald-800 hover:from-emerald-500 hover:to-teal-600 text-white font-extrabold text-sm shadow-xl transition-all duration-200 cursor-pointer flex items-center justify-center gap-2.5 hover:scale-[1.02]"
                 >
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>Submit &amp; Generate Candidate Slip</span>
+                  <MessageCircle className="w-5 h-5 text-emerald-200" />
+                  <span>সাবমিট করুন ও সরাসরি হোয়াটসঅ্যাপে পাঠান (01898-938982)</span>
+                  <ArrowRight className="w-4 h-4 text-emerald-200" />
                 </button>
               </div>
 
@@ -798,33 +825,54 @@ export const AdmissionForm: React.FC<AdmissionFormProps> = ({
         {step === 3 && completedRecord && (
           <div className="space-y-6 animate-in fade-in duration-300">
             
-            {/* WhatsApp Confirmation Required Alert Bar */}
-            <div className="p-5 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-700 to-cyan-800 text-white shadow-lg space-y-3 no-print">
+            {/* WhatsApp Direct Confirmation Banner */}
+            <div className="p-5 rounded-2xl bg-gradient-to-r from-emerald-700 via-teal-700 to-cyan-800 text-white shadow-xl space-y-3 no-print border-2 border-emerald-400/50">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0">
-                    <MessageCircle className="w-6 h-6 text-white" />
+                  <div className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0 shadow-inner">
+                    <MessageCircle className="w-6 h-6 text-emerald-100" />
                   </div>
                   <div>
-                    <div className="text-base font-bold">
-                      রেজিস্ট্রেশন সম্পন্ন হয়েছে! সিট কনফার্ম করতে স্লিপটি হোয়াটসঅ্যাপে পাঠান:
+                    <div className="text-base sm:text-lg font-black flex items-center gap-2">
+                      <span>সরাসরি হোয়াটসঅ্যাপে স্লিপ পাঠানো হচ্ছে...</span>
+                      <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
                     </div>
-                    <div className="text-xs text-emerald-100 mt-0.5">
-                      আপনার ক্যান্ডিডেট স্লিপটি আমাদের অফিশিয়াল হোয়াটসঅ্যাপ নম্বরে (<strong>{CAMPAIGN_INFO.verificationWhatsapp}</strong>) পাঠিয়ে দিলে আমাদের পক্ষ থেকে আপনার সিট নিশ্চিত (Seat Confirmed) করা হবে।
+                    <div className="text-xs sm:text-sm text-emerald-100 mt-1">
+                      হোয়াটসঅ্যাপ ওপেন না হলে নিচের বাটনে ক্লিক করে <strong>{CAMPAIGN_INFO.verificationWhatsapp}</strong> নম্বরে পাঠিয়ে দিন। আমাদের প্রতিনিধি যাচাই করে সিট কনফার্ম করবেন।
                     </div>
                   </div>
                 </div>
 
-                {/* Direct Action Button to WhatsApp */}
-                <a
-                  href={getWhatsAppConfirmationUrl()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-6 py-3 rounded-xl bg-white text-emerald-900 hover:bg-emerald-50 font-extrabold text-xs flex items-center justify-center gap-2 shadow-md transition-all duration-200 hover:scale-102 cursor-pointer shrink-0"
-                >
-                  <Send className="w-4 h-4 text-emerald-700" />
-                  <span>Send to WhatsApp (01898-938982)</span>
-                </a>
+                {/* Direct Action Buttons */}
+                <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 shrink-0">
+                  <a
+                    href={getWhatsAppConfirmationUrl()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-white text-emerald-950 hover:bg-emerald-50 font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg transition-all duration-200 hover:scale-105 cursor-pointer"
+                  >
+                    <Send className="w-4 h-4 text-emerald-700" />
+                    <span>সরাসরি হোয়াটসঅ্যাপে পাঠান</span>
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={handleCopyFullSlip}
+                    className="w-full sm:w-auto px-4 py-3.5 rounded-xl bg-emerald-900/60 hover:bg-emerald-900/90 text-white font-bold text-xs flex items-center justify-center gap-1.5 border border-emerald-400/30 transition-colors cursor-pointer"
+                  >
+                    {copiedSlipText ? (
+                      <>
+                        <Check className="w-4 h-4 text-emerald-300" />
+                        <span>কপি হয়েছে!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4" />
+                        <span>স্লিপ টেক্সট কপি</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -932,7 +980,7 @@ export const AdmissionForm: React.FC<AdmissionFormProps> = ({
                     <div>
                       <span className="text-slate-500">Admission Fee:</span>
                       <div className="font-bold text-emerald-800 font-mono-numbers">
-                        ৳ {completedRecord.amount}/- (১ম ২০ জন অফার)
+                        ৳ {completedRecord.amount}/- (মূল ভর্তি ফি)
                       </div>
                     </div>
                   </div>
@@ -1023,16 +1071,34 @@ export const AdmissionForm: React.FC<AdmissionFormProps> = ({
                   href={getWhatsAppConfirmationUrl()}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-2 transition-colors cursor-pointer shadow-md"
+                  className="px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs flex items-center gap-2 transition-transform hover:scale-105 cursor-pointer shadow-lg"
                 >
-                  <Send className="w-4 h-4" />
-                  <span>Send Slip to WhatsApp (01898-938982)</span>
+                  <MessageCircle className="w-4 h-4" />
+                  <span>সরাসরি হোয়াটসঅ্যাপে স্লিপ পাঠান (01898-938982)</span>
                 </a>
 
                 <button
                   type="button"
+                  onClick={handleCopyFullSlip}
+                  className="px-4 py-3.5 rounded-xl border-2 border-emerald-600 text-emerald-800 hover:bg-emerald-50 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  {copiedSlipText ? (
+                    <>
+                      <Check className="w-4 h-4 text-emerald-600" />
+                      <span>স্লিপ টেক্সট কপি হয়েছে!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4 text-emerald-700" />
+                      <span>স্লিপের সম্পূর্ণ টেক্সট কপি করুন</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
                   onClick={handlePrint}
-                  className="px-5 py-3 rounded-xl bg-blue-950 hover:bg-blue-900 text-white font-bold text-xs flex items-center gap-2 transition-colors cursor-pointer"
+                  className="px-5 py-3.5 rounded-xl bg-blue-950 hover:bg-blue-900 text-white font-bold text-xs flex items-center gap-2 transition-colors cursor-pointer"
                 >
                   <Printer className="w-4 h-4" />
                   <span>Print / Save PDF Slip</span>
@@ -1045,10 +1111,10 @@ export const AdmissionForm: React.FC<AdmissionFormProps> = ({
                       setStep(1);
                       onReset();
                     }}
-                    className="px-4 py-3 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-600 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer ml-auto"
+                    className="px-4 py-3.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-600 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer ml-auto"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
-                    <span>Register Another Candidate</span>
+                    <span>নতুন রেজিস্ট্রেশন</span>
                   </button>
                 )}
               </div>
