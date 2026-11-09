@@ -18,7 +18,8 @@ export interface RegistrationFormData {
   // 2 Payment Options: Online (bKash) or Cash
   paymentMethod: 'bKash (Online)' | 'Cash (Campus / Offline)';
   senderNumber?: string; // for bKash
-  transactionId?: string; // for bKash
+  transactionId?: string; // for bKash (optional if screenshot provided)
+  paymentScreenshot?: string; // Base64 data URL of the bKash payment screenshot
   cashReceivedBy?: string; // for Cash: "কে আমাদের মধ্যে টাকা নিবে তার নাম"
   cashReceiptNo?: string;
   amount: number;

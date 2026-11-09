@@ -40,7 +40,7 @@ export const Footer: React.FC<FooterProps> = ({ onRegisterClick, onLookupClick, 
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-cyan-400 shrink-0" />
-                <span>হটলাইন: 01898-938981, 01898-938982</span>
+                <span>হটলাইন: 01898-938981 · WhatsApp: 01805-743666</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-pink-400 font-bold text-xs">bKash:</span>

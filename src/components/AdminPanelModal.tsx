@@ -20,7 +20,8 @@ import {
   Banknote,
   Shield,
   Eye,
-  EyeOff
+  EyeOff,
+  Camera
 } from 'lucide-react';
 import { CprLogo } from './CprLogo';
 
@@ -45,6 +46,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
   const [passwordInput, setPasswordInput] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [authError, setAuthError] = useState(false);
+  const [adminPreviewImage, setAdminPreviewImage] = useState<{ src: string; title: string } | null>(null);
 
   // Filter & Search states
   const [searchTerm, setSearchTerm] = useState('');
@@ -506,13 +508,33 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                               </div>
 
                               {isBkash ? (
-                                <div className="text-[10px] font-mono text-slate-500 mt-0.5">
-                                  TrxID: <strong className="text-slate-800">{candidate.transactionId}</strong>
-                                  {candidate.senderNumber && ` (${candidate.senderNumber})`}
+                                <div className="text-[10px] font-mono text-slate-500 mt-0.5 space-y-0.5">
+                                  {candidate.transactionId && (
+                                    <div>
+                                      TrxID: <strong className="text-slate-800">{candidate.transactionId}</strong>
+                                    </div>
+                                  )}
+                                  {candidate.senderNumber && <div>প্রেরক: {candidate.senderNumber}</div>}
+                                  {candidate.paymentScreenshot && (
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setAdminPreviewImage({
+                                          src: candidate.paymentScreenshot!,
+                                          title: `Dr. ${candidate.fullName} - বিকাশ পেমেন্ট স্ক্রিনশট (Roll: ${candidate.rollNumber})`,
+                                        })
+                                      }
+                                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-pink-100 hover:bg-pink-200 text-pink-900 font-sans font-bold text-[10px] cursor-pointer transition-colors shadow-2xs mt-0.5"
+                                    >
+                                      <Camera className="w-3 h-3 text-pink-700" />
+                                      <span>📷 স্ক্রিনশট দেখুন</span>
+                                    </button>
+                                  )}
                                 </div>
                               ) : (
                                 <div className="text-[10px] text-slate-600 mt-0.5">
                                   গ্রহীতা: <strong className="text-slate-800">{candidate.cashReceivedBy || 'Office'}</strong>
+                                  {candidate.cashReceiptNo && ` (রশিদ নং: ${candidate.cashReceiptNo})`}
                                 </div>
                               )}
                             </td>
@@ -618,6 +640,45 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
         )}
 
       </div>
+
+      {/* Admin Screenshot Zoom Modal */}
+      {adminPreviewImage && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden flex flex-col relative">
+            <div className="p-4 border-b border-slate-100 flex items-center justify-between">
+              <div className="text-sm font-bold text-slate-900 flex items-center gap-2 truncate pr-2">
+                <Camera className="w-4 h-4 text-pink-600 shrink-0" />
+                <span className="truncate">{adminPreviewImage.title}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAdminPreviewImage(null)}
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                aria-label="Close"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-4 overflow-y-auto flex-1 flex items-center justify-center bg-slate-950/5">
+              <img
+                src={adminPreviewImage.src}
+                alt="bKash Proof Admin View"
+                className="max-w-full max-h-[70vh] object-contain rounded-xl shadow-md border border-slate-200"
+              />
+            </div>
+            <div className="p-3 bg-slate-50 border-t border-slate-100 text-center">
+              <button
+                type="button"
+                onClick={() => setAdminPreviewImage(null)}
+                className="px-6 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors cursor-pointer"
+              >
+                বন্ধ করুন
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

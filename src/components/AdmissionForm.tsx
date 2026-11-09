@@ -25,7 +25,14 @@ import {
   RotateCcw,
   Clock,
   Send,
-  MessageCircle
+  MessageCircle,
+  Upload,
+  Image as ImageIcon,
+  Camera,
+  FileImage,
+  Trash2,
+  Maximize2,
+  X
 } from 'lucide-react';
 import { CprLogo } from './CprLogo';
 
@@ -61,15 +68,20 @@ export const AdmissionForm: React.FC<AdmissionFormProps> = ({
       paymentMethod: 'bKash (Online)',
       senderNumber: '',
       transactionId: '',
+      paymentScreenshot: '',
       cashReceivedBy: '',
       cashReceiptNo: '',
-      amount: CAMPAIGN_INFO.offerPrice,
+      amount: CAMPAIGN_INFO.regularPrice,
     };
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [copiedSlipText, setCopiedSlipText] = useState(false);
+  const [screenshotModalImage, setScreenshotModalImage] = useState<string | null>(null);
+  const [isUploadingScreenshot, setIsUploadingScreenshot] = useState(false);
+  const [copiedScreenshot, setCopiedScreenshot] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
   const [completedRecord, setCompletedRecord] = useState<RegistrationFormData | null>(
     registeredCandidate || null
   );
@@ -79,6 +91,77 @@ export const AdmissionForm: React.FC<AdmissionFormProps> = ({
     navigator.clipboard.writeText(text);
     setCopiedKey(key);
     setTimeout(() => setCopiedKey(null), 2000);
+  };
+
+  // Image Upload & Canvas Compression Helper
+  const handleImageUpload = (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      setErrors((prev) => ({
+        ...prev,
+        paymentScreenshot: 'অনুগ্রহ করে একটি ছবি (JPG, PNG, WEBP) সিলেক্ট করুন।',
+      }));
+      return;
+    }
+    if (file.size > 15 * 1024 * 1024) {
+      setErrors((prev) => ({
+        ...prev,
+        paymentScreenshot: 'ছবির সাইজ ১৫MB এর কম হতে হবে।',
+      }));
+      return;
+    }
+
+    setIsUploadingScreenshot(true);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new window.Image();
+      img.onload = () => {
+        // Compress using canvas to max 1200x1200px
+        const maxDimension = 1200;
+        let width = img.width;
+        let height = img.height;
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          } else {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+          setFormData((prev) => ({ ...prev, paymentScreenshot: compressedDataUrl }));
+          setErrors((prev) => {
+            const next = { ...prev };
+            delete next.paymentScreenshot;
+            return next;
+          });
+        }
+        setIsUploadingScreenshot(false);
+      };
+      img.onerror = () => {
+        setIsUploadingScreenshot(false);
+        setErrors((prev) => ({
+          ...prev,
+          paymentScreenshot: 'ছবিটি লোড করতে সমস্যা হয়েছে, অনুগ্রহ করে অন্য ছবি নির্বাচন করুন।',
+        }));
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.onerror = () => {
+      setIsUploadingScreenshot(false);
+      setErrors((prev) => ({
+        ...prev,
+        paymentScreenshot: 'ছবি আপলোড করতে ব্যর্থ হয়েছে, আবার চেষ্টা করুন।',
+      }));
+    };
+    reader.readAsDataURL(file);
   };
 
   // Step 1 Validation
@@ -105,18 +188,15 @@ export const AdmissionForm: React.FC<AdmissionFormProps> = ({
     return Object.keys(errs).length === 0;
   };
 
-  // Step 2 Validation: Check bKash or Cash inputs
+  // Step 2 Validation: Check bKash (Screenshot preferred) or Cash inputs
   const validateStep2 = () => {
     const errs: Record<string, string> = {};
     
     if (formData.paymentMethod === 'bKash (Online)') {
-      if (!formData.senderNumber?.trim()) {
-        errs.senderNumber = 'বিকাশ প্রেরকের মোবাইল নম্বর আবশ্যক (Sender Number)';
-      }
-      if (!formData.transactionId?.trim()) {
-        errs.transactionId = 'বিকাশ Transaction ID (TrxID) আবশ্যক';
-      } else if (formData.transactionId.trim().length < 5) {
-        errs.transactionId = 'সঠিক TrxID লিখুন (কমপক্ষে ৫ অক্ষর)';
+      // User requested: Screenshot is preferred over typing TrxID!
+      // If either screenshot or TrxID is provided, it's valid.
+      if (!formData.paymentScreenshot && !formData.transactionId?.trim()) {
+        errs.paymentScreenshot = 'অনুগ্রহ করে বিকাশ পেমেন্টের স্ক্রিনশট আপলোড করুন অথবা Transaction ID (TrxID) লিখুন';
       }
     } else if (formData.paymentMethod === 'Cash (Campus / Offline)') {
       if (!formData.cashReceivedBy?.trim()) {
@@ -140,7 +220,7 @@ export const AdmissionForm: React.FC<AdmissionFormProps> = ({
   // Format rich WhatsApp Candidate Slip message
   const generateSlipMessage = (record: RegistrationFormData) => {
     const paymentDetail = record.paymentMethod === 'bKash (Online)'
-      ? `বিকাশ অনলাইন (TrxID: ${record.transactionId}, প্রেরক নম্বর: ${record.senderNumber})`
+      ? `বিকাশ অনলাইন (Send Money ৳ ১৪৯৯${record.paymentScreenshot ? ', স্ক্রিনশট সংযুক্ত ✅' : ''}${record.transactionId ? `, TrxID: ${record.transactionId}` : ''}${record.senderNumber ? `, প্রেরক: ${record.senderNumber}` : ''})`
       : `ক্যাশ পেমেন্ট (টাকা গ্রহণকারী: ${record.cashReceivedBy}${record.cashReceiptNo ? `, রশিদ নং: ${record.cashReceiptNo}` : ''})`;
 
     return `*🏥 CPR MEDICAL ACADEMY – SPECIAL BCS CANDIDATE SLIP 🏥*
@@ -155,11 +235,11 @@ ${record.altMobileNumber ? `📞 বিকল্প নম্বর: ${record.al
 ⏰ *পরীক্ষার সময়:* 3:00 PM (প্রতি পরীক্ষা বিকাল ৩:০০ টায়)
 📍 *অংশগ্রহণের ভেন্যু/মোড:* ${record.examMode}
 💳 *পেমেন্ট পদ্ধতি:* ${paymentDetail}
-💵 *জমা দেওয়া কোর্স ফি:* ৳ ${record.amount}/- (মূল ভর্তি ফি)
+${record.paymentScreenshot ? '📷 *পেমেন্ট প্রুফ:* বিকাশ সেন্ড মানির স্ক্রিনশট পোর্টালে আপলোড করা হয়েছে।\n' : ''}💵 *জমা দেওয়া কোর্স ফি:* ৳ ${record.amount}/- (মূল ভর্তি ফি)
 📅 *আবেদনের তারিখ:* ${record.registrationDate || new Date().toISOString().split('T')[0]}
 ──────────────────────
 আসসালামু আলাইকুম CPR একাডেমি কর্তৃপক্ষ,
-আমি আমার ক্যান্ডিডেট স্লিপটি পাঠালাম। অনুগ্রহ করে পেমেন্ট ও তথ্য যাচাই করে আমার সিট নিশ্চিত (Seat Confirmed) করুন। ধন্যবাদ!`;
+আমি আমার ক্যান্ডিডেট স্লিপটি পাঠালাম${record.paymentScreenshot ? ' (বিকাশ পেমেন্টের স্ক্রিনশটও সাথে ইনবক্সে পাঠাচ্ছি)' : ''}। অনুগ্রহ করে পেমেন্ট ও তথ্য যাচাই করে আমার সিট নিশ্চিত (Seat Confirmed) করুন। ধন্যবাদ!`;
   };
 
   // Pre-filled WhatsApp Confirmation URL helper
@@ -170,8 +250,112 @@ ${record.altMobileNumber ? `📞 বিকল্প নম্বর: ${record.al
     return `https://wa.me/88${CAMPAIGN_INFO.verificationWhatsappRaw}?text=${encodeURIComponent(message)}`;
   };
 
-  // Handle Step 2 Final Submit with Direct WhatsApp Redirect
-  const handleStep2Submit = (e: React.FormEvent) => {
+  // Copy screenshot image directly to clipboard as PNG blob so it can be pasted into WhatsApp
+  const copyScreenshotImageToClipboard = async (dataUrl: string) => {
+    try {
+      const img = new window.Image();
+      img.src = dataUrl;
+      await new Promise((resolve) => {
+        img.onload = resolve;
+      });
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return false;
+      ctx.drawImage(img, 0, 0);
+
+      return new Promise<boolean>((resolve) => {
+        canvas.toBlob(async (blob) => {
+          if (!blob) {
+            resolve(false);
+            return;
+          }
+          try {
+            await navigator.clipboard.write([
+              new ClipboardItem({ 'image/png': blob }),
+            ]);
+            setCopiedScreenshot(true);
+            setTimeout(() => setCopiedScreenshot(false), 2500);
+            resolve(true);
+          } catch (e) {
+            console.warn('ClipboardItem write image failed', e);
+            resolve(false);
+          }
+        }, 'image/png');
+      });
+    } catch (e) {
+      console.warn('Failed to copy screenshot to clipboard', e);
+      return false;
+    }
+  };
+
+  // Helper to download the screenshot to device
+  const handleDownloadScreenshot = () => {
+    const target = completedRecord;
+    if (!target?.paymentScreenshot) return;
+    const link = document.createElement('a');
+    link.href = target.paymentScreenshot;
+    link.download = `CPR_bKash_Slip_Roll_${target.rollNumber || 'proof'}.jpg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Native share / WhatsApp launcher that sends the actual screenshot image file and text
+  const handleShareWithScreenshot = async (record?: RegistrationFormData | null) => {
+    const target = record || completedRecord;
+    if (!target) return;
+    setIsSharing(true);
+
+    const messageText = generateSlipMessage(target);
+
+    // 1. If Web Share API with files is supported (supported on Android/iOS Chrome & Safari)
+    if (target.paymentScreenshot) {
+      try {
+        const res = await fetch(target.paymentScreenshot);
+        const blob = await res.blob();
+        const file = new File(
+          [blob],
+          `CPR_bKash_Receipt_Roll_${target.rollNumber || 'proof'}.jpg`,
+          { type: 'image/jpeg' }
+        );
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: 'CPR Medical Academy - Special BCS Admission',
+            text: messageText,
+            files: [file],
+          });
+          setIsSharing(false);
+          return;
+        }
+      } catch (err: any) {
+        if (err.name === 'AbortError') {
+          setIsSharing(false);
+          return; // user cancelled share sheet
+        }
+        console.warn('Web share with file failed, falling back to clipboard and wa.me', err);
+      }
+    }
+
+    // 2. Automatically copy the image to clipboard so user can just Ctrl+V or Paste in WhatsApp
+    if (target.paymentScreenshot) {
+      await copyScreenshotImageToClipboard(target.paymentScreenshot);
+    }
+
+    // 3. Open WhatsApp Web or Mobile App
+    const waUrl = getWhatsAppConfirmationUrl(target);
+    try {
+      window.open(waUrl, '_blank');
+    } catch (err) {
+      console.error('WhatsApp redirect error:', err);
+    }
+    setIsSharing(false);
+  };
+
+  // Handle Step 2 Final Submit with Direct WhatsApp Share & Screenshot Transfer
+  const handleStep2Submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateStep2()) {
       const generatedRoll = Math.floor(240000 + Math.random() * 9000).toString();
@@ -188,13 +372,8 @@ ${record.altMobileNumber ? `📞 বিকল্প নম্বর: ${record.al
       onSuccessfulRegistration(newRecord);
       setStep(3);
 
-      // Direct WhatsApp redirect: Immediately open WhatsApp with formatted slip to 01898-938982
-      const waUrl = getWhatsAppConfirmationUrl(newRecord);
-      try {
-        window.open(waUrl, '_blank');
-      } catch (err) {
-        console.error('Automatic WhatsApp redirect error:', err);
-      }
+      // Directly launch WhatsApp with screenshot and text
+      await handleShareWithScreenshot(newRecord);
 
       window.scrollTo({ top: document.getElementById('admission-form-section')?.offsetTop ?? 0, behavior: 'smooth' });
     }
@@ -674,54 +853,162 @@ ${record.altMobileNumber ? `📞 বিকল্প নম্বর: ${record.al
                       <p>১. আপনার বিকাশ অ্যাপ ওপেন করুন অথবা *247# ডায়াল করুন।</p>
                       <p>২. <strong>Send Money</strong> সিলেক্ট করে নম্বর দিন: <strong className="text-pink-300 font-mono">01675226753</strong></p>
                       <p>৩. টাকার পরিমাণ দিন: <strong className="text-white">1499</strong> (রেফারেন্স: <span className="text-cyan-300">BCS</span>)</p>
-                      <p>৪. সফলভাবে সেন্ড মানি করার পর ফিরতি SMS-এর Transaction ID (TrxID) নিচে দিন।</p>
+                      <p>৪. সফলভাবে সেন্ড মানি করার পর ট্রানজেকশনের স্ক্রিনশটটি নিচে আপলোড করুন।</p>
                     </div>
                   </div>
 
-                  {/* bKash Inputs */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                        Sender Mobile Number (বিকাশ প্রেরক নম্বর) <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="tel"
-                        required
-                        placeholder="e.g. 017XXXXXXXX (যে নম্বর থেকে টাকা পাঠিয়েছেন)"
-                        value={formData.senderNumber || ''}
-                        onChange={(e) => setFormData({ ...formData, senderNumber: e.target.value })}
-                        className={`w-full px-4 py-3 rounded-xl border text-sm text-slate-900 focus:outline-none focus:ring-2 transition-all font-mono-numbers ${
-                          errors.senderNumber
-                            ? 'border-red-400 focus:ring-red-400/30'
-                            : 'border-slate-200 focus:border-cyan-500 focus:ring-cyan-500/20'
-                        }`}
-                      />
-                      {errors.senderNumber && (
-                        <p className="text-xs text-red-500 mt-1">{errors.senderNumber}</p>
+                  {/* PRIMARY: Payment Screenshot Upload (User Request) */}
+                  <div className="space-y-3 p-5 rounded-2xl bg-pink-50/70 border-2 border-dashed border-pink-300 transition-all">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-lg bg-pink-600 text-white flex items-center justify-center shadow-xs shrink-0">
+                          <Camera className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-slate-900 uppercase tracking-wider">
+                            পেমেন্টের স্ক্রিনশট আপলোড করুন (Upload Payment Screenshot) <span className="text-red-500">*</span>
+                          </label>
+                          <p className="text-[11px] text-slate-600">
+                            বিকাশ সেন্ড মানি কনফার্মেশন স্ক্রিন বা ফিরতি মেসেজের স্ক্রিনশট যুক্ত করুন
+                          </p>
+                        </div>
+                      </div>
+                      {formData.paymentScreenshot && (
+                        <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 rounded-full">
+                          <Check className="w-3.5 h-3.5" />
+                          <span>আপলোড সম্পন্ন</span>
+                        </span>
                       )}
                     </div>
 
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                        Transaction ID (TrxID) <span className="text-red-500">*</span>
+                    {!formData.paymentScreenshot ? (
+                      /* Drag & Drop / File Input Box */
+                      <label className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-pink-300 hover:border-pink-500 hover:bg-pink-100/60 rounded-xl cursor-pointer transition-all group bg-white/60">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleImageUpload(file);
+                          }}
+                        />
+                        <div className="w-12 h-12 rounded-full bg-pink-100 text-pink-700 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform shadow-xs">
+                          <Upload className="w-6 h-6" />
+                        </div>
+                        <span className="text-xs font-bold text-pink-900 text-center">
+                          {isUploadingScreenshot ? 'ছবি প্রসেস করা হচ্ছে...' : 'স্ক্রিনশট আপলোড করতে এখানে ক্লিক করুন (বা ছবি ড্রপ করুন)'}
+                        </span>
+                        <span className="text-[11px] text-slate-500 mt-1">
+                          PNG, JPG, JPEG, WEBP সমর্থিত (সর্বোচ্চ ১৫MB)
+                        </span>
                       </label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="e.g. BK9X8291Q বা 9J283H49K"
-                        value={formData.transactionId || ''}
-                        onChange={(e) =>
-                          setFormData({ ...formData, transactionId: e.target.value.toUpperCase() })
-                        }
-                        className={`w-full px-4 py-3 rounded-xl border text-sm text-slate-900 uppercase tracking-wider focus:outline-none focus:ring-2 transition-all font-mono-numbers ${
-                          errors.transactionId
-                            ? 'border-red-400 focus:ring-red-400/30'
-                            : 'border-slate-200 focus:border-cyan-500 focus:ring-cyan-500/20'
-                        }`}
-                      />
-                      {errors.transactionId && (
-                        <p className="text-xs text-red-500 mt-1">{errors.transactionId}</p>
-                      )}
+                    ) : (
+                      /* Uploaded Screenshot Preview Box */
+                      <div className="flex flex-col sm:flex-row items-center gap-4 p-4 bg-white rounded-xl border border-pink-200 shadow-xs">
+                        <div
+                          onClick={() => setScreenshotModalImage(formData.paymentScreenshot!)}
+                          className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden border-2 border-slate-200 cursor-pointer group shrink-0 shadow-sm bg-slate-100"
+                          title="বড় করে দেখতে ক্লিক করুন"
+                        >
+                          <img
+                            src={formData.paymentScreenshot}
+                            alt="bKash Payment Proof"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                          />
+                          <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                            <Maximize2 className="w-5 h-5" />
+                          </div>
+                        </div>
+
+                        <div className="flex-1 text-center sm:text-left space-y-1.5">
+                          <div className="text-xs font-bold text-slate-900 flex items-center justify-center sm:justify-start gap-1.5">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                            <span>বিকাশ পেমেন্টের স্ক্রিনশট সফলভাবে সংযুক্ত হয়েছে</span>
+                          </div>
+                          <p className="text-[11px] text-slate-500">
+                            ছবিটি বড় করে যাচাই করতে থাম্বনেইলে ক্লিক করুন।
+                          </p>
+                          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
+                            <button
+                              type="button"
+                              onClick={() => setScreenshotModalImage(formData.paymentScreenshot!)}
+                              className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                            >
+                              <Maximize2 className="w-3.5 h-3.5" />
+                              <span>বড় করে দেখুন</span>
+                            </button>
+                            <label className="px-3 py-1.5 rounded-lg bg-pink-100 hover:bg-pink-200 text-pink-900 text-xs font-bold flex items-center gap-1 cursor-pointer transition-colors">
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) handleImageUpload(file);
+                                }}
+                              />
+                              <Upload className="w-3.5 h-3.5" />
+                              <span>ছবি পরিবর্তন করুন</span>
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => setFormData({ ...formData, paymentScreenshot: '' })}
+                              className="px-3 py-1.5 rounded-lg hover:bg-red-50 text-red-600 text-xs font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              <span>মুছে ফেলুন</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {errors.paymentScreenshot && (
+                      <p className="text-xs font-bold text-red-600 mt-1.5 flex items-center gap-1.5 bg-red-50 p-2.5 rounded-lg border border-red-200">
+                        <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
+                        <span>{errors.paymentScreenshot}</span>
+                      </p>
+                    )}
+                  </div>
+
+                  {/* SECONDARY / OPTIONAL: Sender Phone & TrxID */}
+                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                    <div className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center justify-between">
+                      <span>অতিরিক্ত তথ্য (ঐচ্ছিক / Optional)</span>
+                      <span className="text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                        স্ক্রিনশট দিলে TrxID না দিলেও চলবে
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                          বিকাশ প্রেরক নম্বর (Sender Number) <span className="text-slate-400 font-normal">(ঐচ্ছিক)</span>
+                        </label>
+                        <input
+                          type="tel"
+                          placeholder="e.g. 017XXXXXXXX"
+                          value={formData.senderNumber || ''}
+                          onChange={(e) => setFormData({ ...formData, senderNumber: e.target.value })}
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all font-mono-numbers"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                          Transaction ID (TrxID) <span className="text-slate-400 font-normal">(ঐচ্ছিক)</span>
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. BK9X8291Q (যদি থাকে)"
+                          value={formData.transactionId || ''}
+                          onChange={(e) =>
+                            setFormData({ ...formData, transactionId: e.target.value.toUpperCase() })
+                          }
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 uppercase tracking-wider focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all font-mono-numbers"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -812,7 +1099,7 @@ ${record.altMobileNumber ? `📞 বিকল্প নম্বর: ${record.al
                   className="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-700 to-emerald-800 hover:from-emerald-500 hover:to-teal-600 text-white font-extrabold text-sm shadow-xl transition-all duration-200 cursor-pointer flex items-center justify-center gap-2.5 hover:scale-[1.02]"
                 >
                   <MessageCircle className="w-5 h-5 text-emerald-200" />
-                  <span>সাবমিট করুন ও সরাসরি হোয়াটসঅ্যাপে পাঠান (01898-938982)</span>
+                  <span>সাবমিট করুন ও সরাসরি হোয়াটসঅ্যাপে পাঠান (01805-743666)</span>
                   <ArrowRight className="w-4 h-4 text-emerald-200" />
                 </button>
               </div>
@@ -826,34 +1113,45 @@ ${record.altMobileNumber ? `📞 বিকল্প নম্বর: ${record.al
           <div className="space-y-6 animate-in fade-in duration-300">
             
             {/* WhatsApp Direct Confirmation Banner */}
-            <div className="p-5 rounded-2xl bg-gradient-to-r from-emerald-700 via-teal-700 to-cyan-800 text-white shadow-xl space-y-3 no-print border-2 border-emerald-400/50">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0 shadow-inner">
-                    <MessageCircle className="w-6 h-6 text-emerald-100" />
+            <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-emerald-800 via-teal-800 to-cyan-900 text-white shadow-xl space-y-4 no-print border-2 border-emerald-400">
+              <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                <div className="flex items-start gap-3.5">
+                  <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0 shadow-inner">
+                    <MessageCircle className="w-7 h-7 text-emerald-200" />
                   </div>
-                  <div>
+                  <div className="space-y-1">
                     <div className="text-base sm:text-lg font-black flex items-center gap-2">
-                      <span>সরাসরি হোয়াটসঅ্যাপে স্লিপ পাঠানো হচ্ছে...</span>
+                      <span>স্ক্রিনশটসহ হোয়াটসঅ্যাপে পাঠানো হচ্ছে...</span>
                       <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
                     </div>
-                    <div className="text-xs sm:text-sm text-emerald-100 mt-1">
-                      হোয়াটসঅ্যাপ ওপেন না হলে নিচের বাটনে ক্লিক করে <strong>{CAMPAIGN_INFO.verificationWhatsapp}</strong> নম্বরে পাঠিয়ে দিন। আমাদের প্রতিনিধি যাচাই করে সিট কনফার্ম করবেন।
-                    </div>
+                    <p className="text-xs sm:text-sm text-emerald-100 leading-relaxed">
+                      হোয়াটসঅ্যাপ ওপেন হলে <strong>01805-743666</strong> নম্বরে আপনার বিকাশ পেমেন্টের স্ক্রিনশট ও স্লিপটি পাঠিয়ে দিন। একাডেমি প্রতিনিধি যাচাই করে আপনার সিট নিশ্চিত করবেন।
+                    </p>
+                    {completedRecord.paymentScreenshot && (
+                      <div className="flex flex-wrap items-center gap-2 pt-1">
+                        <span className="text-[11px] bg-emerald-950/70 border border-emerald-400/50 text-emerald-200 px-2.5 py-0.5 rounded-md font-bold flex items-center gap-1.5">
+                          <Check className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>পেমেন্ট স্ক্রিনশট সংযুক্ত রয়েছে</span>
+                        </span>
+                        <span className="text-[11px] text-emerald-200/90 font-medium">
+                          (চ্যাটে গিয়ে শুধু <strong>Paste / পেস্ট</strong> করুন বা গ্যালারি থেকে সিলেক্ট করুন)
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                {/* Direct Action Buttons */}
+                {/* Direct Action Button */}
                 <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 shrink-0">
-                  <a
-                    href={getWhatsAppConfirmationUrl()}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    type="button"
+                    onClick={() => handleShareWithScreenshot(completedRecord)}
+                    disabled={isSharing}
                     className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-white text-emerald-950 hover:bg-emerald-50 font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg transition-all duration-200 hover:scale-105 cursor-pointer"
                   >
                     <Send className="w-4 h-4 text-emerald-700" />
-                    <span>সরাসরি হোয়াটসঅ্যাপে পাঠান</span>
-                  </a>
+                    <span>স্ক্রিনশটসহ হোয়াটসঅ্যাপে পাঠান</span>
+                  </button>
 
                   <button
                     type="button"
@@ -874,6 +1172,49 @@ ${record.altMobileNumber ? `📞 বিকল্প নম্বর: ${record.al
                   </button>
                 </div>
               </div>
+
+              {/* Dedicated Screenshot Action Bar */}
+              {completedRecord.paymentScreenshot && (
+                <div className="pt-3 border-t border-emerald-700/60 flex flex-wrap items-center gap-2 text-xs">
+                  <span className="text-emerald-200 font-bold">স্ক্রিনশট অ্যাকশন:</span>
+                  
+                  <button
+                    type="button"
+                    onClick={() => copyScreenshotImageToClipboard(completedRecord.paymentScreenshot!)}
+                    className="px-3 py-1.5 rounded-lg bg-emerald-900/80 hover:bg-emerald-950 text-emerald-100 font-bold flex items-center gap-1.5 cursor-pointer transition-colors border border-emerald-400/30"
+                  >
+                    {copiedScreenshot ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-emerald-300" />
+                        <span>স্ক্রিনশট কপি হয়েছে! (WhatsApp-এ Paste করুন)</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>স্ক্রিনশট কপি করুন (WhatsApp-এ Paste করতে)</span>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleDownloadScreenshot}
+                    className="px-3 py-1.5 rounded-lg bg-emerald-900/80 hover:bg-emerald-950 text-emerald-100 font-bold flex items-center gap-1.5 cursor-pointer transition-colors border border-emerald-400/30"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>স্ক্রিনশট ডাউনলোড</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setScreenshotModalImage(completedRecord.paymentScreenshot!)}
+                    className="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 text-white font-bold flex items-center gap-1.5 cursor-pointer transition-colors ml-auto"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5" />
+                    <span>স্ক্রিনশট দেখুন</span>
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Official Candidate Admission Slip Card (Printable) */}
@@ -994,8 +1335,38 @@ ${record.altMobileNumber ? `📞 বিকল্প নম্বর: ${record.al
                       </span>
                     </div>
                     {completedRecord.paymentMethod === 'bKash (Online)' ? (
-                      <div className="font-mono-numbers text-[11px] text-slate-600">
-                        TrxID: <strong>{completedRecord.transactionId}</strong> · Sender Phone: {completedRecord.senderNumber}
+                      <div className="text-[11px] text-slate-700 space-y-1.5">
+                        <div className="font-mono-numbers text-slate-600 flex flex-wrap items-center gap-2">
+                          <span>বিকাশ সেন্ড মানি (৳ {completedRecord.amount})</span>
+                          {completedRecord.senderNumber && <span>· প্রেরক: {completedRecord.senderNumber}</span>}
+                          {completedRecord.transactionId && <span>· TrxID: {completedRecord.transactionId}</span>}
+                        </div>
+                        {completedRecord.paymentScreenshot && (
+                          <div className="flex items-center gap-2 pt-1 font-sans">
+                            <div
+                              onClick={() => setScreenshotModalImage(completedRecord.paymentScreenshot!)}
+                              className="relative w-10 h-10 rounded-md overflow-hidden border border-slate-300 cursor-pointer shadow-2xs hover:ring-2 hover:ring-cyan-500 transition-all shrink-0"
+                              title="স্ক্রিনশট বড় করে দেখতে ক্লিক করুন"
+                            >
+                              <img
+                                src={completedRecord.paymentScreenshot}
+                                alt="Payment Proof"
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <span className="text-emerald-700 font-bold flex items-center gap-1 text-[11px] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                              <Check className="w-3 h-3 text-emerald-600" />
+                              <span>বিকাশ পেমেন্ট স্ক্রিনশট সংযুক্ত</span>
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setScreenshotModalImage(completedRecord.paymentScreenshot!)}
+                              className="text-[11px] text-cyan-800 underline font-bold cursor-pointer hover:text-cyan-900"
+                            >
+                              বড় করে দেখুন
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <div className="text-[11px] text-slate-700">
@@ -1019,7 +1390,7 @@ ${record.altMobileNumber ? `📞 বিকল্প নম্বর: ${record.al
                   </div>
                   <div className="text-[10px] text-slate-500 space-y-0.5">
                     <div className="font-bold text-slate-800">CPR DIGITAL VERIFY</div>
-                    <div>WhatsApp Confirm: 01898-938982</div>
+                    <div>WhatsApp Confirm: 01805-743666</div>
                     <div className="font-mono">{completedRecord.registrationId}</div>
                   </div>
                 </div>
@@ -1049,7 +1420,7 @@ ${record.altMobileNumber ? `📞 বিকল্প নম্বর: ${record.al
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                   <span>
-                    <strong>হোয়াটসঅ্যাপ কনফার্মেশন:</strong> আপনার এই ক্যান্ডিডেট স্লিপটি আমাদের হোয়াটসঅ্যাপ নম্বরে (<strong>01898-938982</strong>) পাঠিয়ে দিন। কর্তৃপক্ষ যাচাই করে আপনার সিট নিশ্চিত (Seat Confirmed) করবে।
+                    <strong>হোয়াটসঅ্যাপ কনফার্মেশন:</strong> আপনার এই ক্যান্ডিডেট স্লিপটি আমাদের হোয়াটসঅ্যাপ নম্বরে (<strong>01805-743666</strong>) পাঠিয়ে দিন। কর্তৃপক্ষ যাচাই করে আপনার সিট নিশ্চিত (Seat Confirmed) করবে।
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
@@ -1067,15 +1438,15 @@ ${record.altMobileNumber ? `📞 বিকল্প নম্বর: ${record.al
               </ul>
 
               <div className="pt-3 flex flex-wrap items-center gap-3">
-                <a
-                  href={getWhatsAppConfirmationUrl()}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  type="button"
+                  onClick={() => handleShareWithScreenshot(completedRecord)}
+                  disabled={isSharing}
                   className="px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs flex items-center gap-2 transition-transform hover:scale-105 cursor-pointer shadow-lg"
                 >
                   <MessageCircle className="w-4 h-4" />
-                  <span>সরাসরি হোয়াটসঅ্যাপে স্লিপ পাঠান (01898-938982)</span>
-                </a>
+                  <span>স্ক্রিনশটসহ হোয়াটসঅ্যাপে পাঠান (01805-743666)</span>
+                </button>
 
                 <button
                   type="button"
@@ -1124,6 +1495,45 @@ ${record.altMobileNumber ? `📞 বিকল্প নম্বর: ${record.al
         )}
 
       </div>
+
+      {/* Modal for Full-Size Screenshot Preview */}
+      {screenshotModalImage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-200 no-print">
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden flex flex-col relative">
+            <div className="p-4 border-b border-slate-100 flex items-center justify-between">
+              <div className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <Camera className="w-4 h-4 text-pink-600" />
+                <span>বিকাশ পেমেন্ট স্ক্রিনশট প্রিভিউ</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setScreenshotModalImage(null)}
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
+                aria-label="Close"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-4 overflow-y-auto flex-1 flex items-center justify-center bg-slate-950/5">
+              <img
+                src={screenshotModalImage}
+                alt="Payment proof full"
+                className="max-w-full max-h-[70vh] object-contain rounded-xl shadow-md border border-slate-200"
+              />
+            </div>
+            <div className="p-3 bg-slate-50 border-t border-slate-100 text-center">
+              <button
+                type="button"
+                onClick={() => setScreenshotModalImage(null)}
+                className="px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors cursor-pointer"
+              >
+                বন্ধ করুন (Close)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </section>
   );
 };

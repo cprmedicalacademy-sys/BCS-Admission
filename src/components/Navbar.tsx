@@ -47,10 +47,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onRegisterClick, onLookupClick, 
             </a>
             <span className="text-slate-600">/</span>
             <a
-              href="tel:01898938982"
-              className="hover:text-cyan-300 transition-colors flex items-center gap-1"
+              href="https://wa.me/8801805743666"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-emerald-300 text-emerald-300 transition-colors flex items-center gap-1 font-bold"
             >
-              <span>01898-938982</span>
+              <span>WhatsApp: 01805-743666</span>
             </a>
           </div>
         </div>
@@ -205,10 +207,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onRegisterClick, onLookupClick, 
               Register Online · ৳ ১৪৯৯
             </button>
             <a
-              href="tel:01898938981"
-              className="text-center text-xs text-slate-500 py-1"
+              href="https://wa.me/8801805743666"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-center text-xs text-slate-500 hover:text-emerald-700 py-1"
             >
-              হটলাইন: 01898-938981, 01898-938982 (চকবাজার, চট্টগ্রাম)
+              হটলাইন: 01898-938981 · WhatsApp: 01805-743666 (চকবাজার, চট্টগ্রাম)
             </a>
           </div>
         </div>
