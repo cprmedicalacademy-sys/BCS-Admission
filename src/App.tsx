@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { RegistrationFormData } from './types';
 import { SEEDED_CANDIDATES } from './data/courseData';
 import { Navbar } from './components/Navbar';
@@ -15,12 +15,37 @@ import { MentorsSection } from './components/MentorsSection';
 import { FAQSection } from './components/FAQSection';
 import { Footer } from './components/Footer';
 import { RegistrationLookupModal } from './components/RegistrationLookupModal';
-import { Snowflake, Sparkles, PhoneCall, CheckCircle } from 'lucide-react';
+import { AdminPanelModal } from './components/AdminPanelModal';
 
 export default function App() {
-  const [candidates, setCandidates] = useState<RegistrationFormData[]>(SEEDED_CANDIDATES);
+  // Candidate list initialized from localStorage (so new admissions persist) or fallback to seeded list
+  const [candidates, setCandidates] = useState<RegistrationFormData[]>(() => {
+    try {
+      const stored = localStorage.getItem('cpr_admitted_candidates_v3');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch (e) {
+      console.error('Failed to parse cached candidates', e);
+    }
+    return SEEDED_CANDIDATES;
+  });
+
   const [selectedCandidate, setSelectedCandidate] = useState<RegistrationFormData | null>(null);
   const [isLookupOpen, setIsLookupOpen] = useState(false);
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
+
+  // Sync candidate roster to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('cpr_admitted_candidates_v3', JSON.stringify(candidates));
+    } catch (e) {
+      console.error('Failed to save candidates to localStorage', e);
+    }
+  }, [candidates]);
 
   // Smooth scroll to admission form
   const handleRegisterClick = () => {
@@ -39,14 +64,35 @@ export default function App() {
     }
   };
 
-  // When a new registration is submitted
+  // When a new registration is submitted (automatically adds to Admin Panel!)
   const handleNewRegistration = (candidate: RegistrationFormData) => {
     setCandidates((prev) => [candidate, ...prev]);
     setSelectedCandidate(candidate);
   };
 
-  // When a candidate is selected from the lookup modal
-  const handleSelectFromLookup = (candidate: RegistrationFormData) => {
+  // Update candidate status in Admin Panel (e.g. Confirm Seat / Mark Pending)
+  const handleUpdateCandidateStatus = (
+    rollNumber: string,
+    newStatus: 'Confirmed' | 'Pending WhatsApp Confirmation'
+  ) => {
+    setCandidates((prev) =>
+      prev.map((c) => (c.rollNumber === rollNumber ? { ...c, status: newStatus } : c))
+    );
+    if (selectedCandidate && selectedCandidate.rollNumber === rollNumber) {
+      setSelectedCandidate((prev) => (prev ? { ...prev, status: newStatus } : null));
+    }
+  };
+
+  // Delete candidate from Admin Panel
+  const handleDeleteCandidate = (rollNumber: string) => {
+    setCandidates((prev) => prev.filter((c) => c.rollNumber !== rollNumber));
+    if (selectedCandidate && selectedCandidate.rollNumber === rollNumber) {
+      setSelectedCandidate(null);
+    }
+  };
+
+  // When a candidate is selected to view their official slip
+  const handleSelectCandidateToViewSlip = (candidate: RegistrationFormData) => {
     setSelectedCandidate(candidate);
     const element = document.getElementById('admission-form-section');
     if (element) {
@@ -61,6 +107,7 @@ export default function App() {
       <Navbar
         onRegisterClick={handleRegisterClick}
         onLookupClick={() => setIsLookupOpen(true)}
+        onAdminClick={() => setIsAdminOpen(true)}
       />
 
       <main className="flex-1">
@@ -94,6 +141,7 @@ export default function App() {
       <Footer
         onRegisterClick={handleRegisterClick}
         onLookupClick={() => setIsLookupOpen(true)}
+        onAdminClick={() => setIsAdminOpen(true)}
       />
 
       {/* Candidate Roll Lookup Modal */}
@@ -101,7 +149,17 @@ export default function App() {
         isOpen={isLookupOpen}
         onClose={() => setIsLookupOpen(false)}
         allCandidates={candidates}
-        onSelectCandidate={handleSelectFromLookup}
+        onSelectCandidate={handleSelectCandidateToViewSlip}
+      />
+
+      {/* Admin Panel Modal (Pass: 2926, zero hints) */}
+      <AdminPanelModal
+        isOpen={isAdminOpen}
+        onClose={() => setIsAdminOpen(false)}
+        candidates={candidates}
+        onUpdateCandidateStatus={handleUpdateCandidateStatus}
+        onDeleteCandidate={handleDeleteCandidate}
+        onSelectCandidateToViewSlip={handleSelectCandidateToViewSlip}
       />
 
       {/* Mobile Floating Sticky CTA (respecting 15% mobile sticky cap per §1.I) */}

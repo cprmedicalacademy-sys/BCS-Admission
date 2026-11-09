@@ -980,7 +980,7 @@ export const AdmissionForm: React.FC<AdmissionFormProps> = ({
                 <div className="text-center sm:text-right">
                   <div className="inline-block border-b border-slate-800 pb-1 px-4">
                     <span className="font-serif italic text-sm text-blue-950 font-bold">
-                      Dr Didarul Hoque Sakib, BCS (Health)
+                      Dr. Muhammad Shahnewaz
                     </span>
                   </div>
                   <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-1">

@@ -6,9 +6,10 @@ import { Mail, Phone, MapPin, ShieldCheck, ArrowUp } from 'lucide-react';
 interface FooterProps {
   onRegisterClick: () => void;
   onLookupClick: () => void;
+  onAdminClick: () => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onRegisterClick, onLookupClick }) => {
+export const Footer: React.FC<FooterProps> = ({ onRegisterClick, onLookupClick, onAdminClick }) => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -116,7 +117,14 @@ export const Footer: React.FC<FooterProps> = ({ onRegisterClick, onLookupClick }
           </div>
 
           <div className="flex items-center gap-4">
-            <span>Special BCS Admission Portal</span>
+            <button
+              onClick={onAdminClick}
+              className="text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-1 cursor-pointer"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-slate-500" />
+              <span>Admin Panel</span>
+            </button>
+            <span className="text-slate-700">|</span>
             <button
               onClick={scrollToTop}
               className="hover:text-cyan-400 transition-colors flex items-center gap-1 cursor-pointer"

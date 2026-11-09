@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { CprLogo } from './CprLogo';
-import { Menu, X, PhoneCall, Search } from 'lucide-react';
+import { Menu, X, PhoneCall, Search, Shield } from 'lucide-react';
 
 interface NavbarProps {
   onRegisterClick: () => void;
   onLookupClick: () => void;
+  onAdminClick: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onRegisterClick, onLookupClick }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onRegisterClick, onLookupClick, onAdminClick }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -20,13 +21,21 @@ export const Navbar: React.FC<NavbarProps> = ({ onRegisterClick, onLookupClick }
             <span>মূল পরীক্ষা ফি ৳ ১৪৯৯ · ১ম ২০ জন কে ৳ ১১৯৯ টাকায় ভর্তি</span>
             <span className="hidden sm:inline text-sky-200">· চকবাজার, চট্টগ্রাম ও অনলাইন</span>
           </div>
-          <div className="hidden md:flex items-center gap-4 text-slate-300">
+          <div className="hidden md:flex items-center gap-3 text-slate-300">
             <button
               onClick={onLookupClick}
               className="hover:text-cyan-300 transition-colors flex items-center gap-1 cursor-pointer"
             >
               <Search className="w-3.5 h-3.5" />
-              <span>Verify Registered Roll</span>
+              <span>Verify Roll</span>
+            </button>
+            <span className="text-slate-600">|</span>
+            <button
+              onClick={onAdminClick}
+              className="hover:text-cyan-300 transition-colors flex items-center gap-1 cursor-pointer text-cyan-200"
+            >
+              <Shield className="w-3.5 h-3.5" />
+              <span>Admin Panel</span>
             </button>
             <span className="text-slate-600">|</span>
             <a
@@ -172,6 +181,16 @@ export const Navbar: React.FC<NavbarProps> = ({ onRegisterClick, onLookupClick }
             >
               <Search className="w-4 h-4" />
               <span>Verify Admitted Roll & Slip</span>
+            </button>
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                onAdminClick();
+              }}
+              className="text-left px-3 py-2 rounded-md hover:bg-slate-100 text-slate-700 flex items-center gap-2 font-bold"
+            >
+              <Shield className="w-4 h-4 text-cyan-700" />
+              <span>Admin Panel</span>
             </button>
           </nav>
 
