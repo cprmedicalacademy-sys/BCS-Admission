@@ -354,8 +354,8 @@ ${record.paymentScreenshot ? '📷 *পেমেন্ট প্রুফ:* ব�
     setIsSharing(false);
   };
 
-  // Handle Step 2 Final Submit with Direct WhatsApp Share & Screenshot Transfer
-  const handleStep2Submit = async (e: React.FormEvent) => {
+  // Handle Step 2 Final Submit with Direct Instant Auto-Launch to WhatsApp
+  const handleStep2Submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateStep2()) {
       const generatedRoll = Math.floor(240000 + Math.random() * 9000).toString();
@@ -372,8 +372,20 @@ ${record.paymentScreenshot ? '📷 *পেমেন্ট প্রুফ:* ব�
       onSuccessfulRegistration(newRecord);
       setStep(3);
 
-      // Directly launch WhatsApp with screenshot and text
-      await handleShareWithScreenshot(newRecord);
+      // Instant WhatsApp URL for auto-sending
+      const waUrl = getWhatsAppConfirmationUrl(newRecord);
+
+      // DIRECT INSTANT AUTO-SEND TO WHATSAPP (01805-743666):
+      // Synchronous execution ensures the browser popup blocker NEVER blocks it!
+      try {
+        const popup = window.open(waUrl, '_blank');
+        if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+          // If popup is blocked by browser settings, immediately navigate to WhatsApp:
+          window.location.href = waUrl;
+        }
+      } catch (err) {
+        window.location.href = waUrl;
+      }
 
       window.scrollTo({ top: document.getElementById('admission-form-section')?.offsetTop ?? 0, behavior: 'smooth' });
     }
@@ -1143,15 +1155,15 @@ ${record.paymentScreenshot ? '📷 *পেমেন্ট প্রুফ:* ব�
 
                 {/* Direct Action Button */}
                 <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => handleShareWithScreenshot(completedRecord)}
-                    disabled={isSharing}
+                  <a
+                    href={getWhatsAppConfirmationUrl(completedRecord)}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-white text-emerald-950 hover:bg-emerald-50 font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg transition-all duration-200 hover:scale-105 cursor-pointer"
                   >
                     <Send className="w-4 h-4 text-emerald-700" />
-                    <span>স্ক্রিনশটসহ হোয়াটসঅ্যাপে পাঠান</span>
-                  </button>
+                    <span>সরাসরি হোয়াটসঅ্যাপে পাঠান (01805-743666)</span>
+                  </a>
 
                   <button
                     type="button"
@@ -1438,15 +1450,35 @@ ${record.paymentScreenshot ? '📷 *পেমেন্ট প্রুফ:* ব�
               </ul>
 
               <div className="pt-3 flex flex-wrap items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => handleShareWithScreenshot(completedRecord)}
-                  disabled={isSharing}
-                  className="px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs flex items-center gap-2 transition-transform hover:scale-105 cursor-pointer shadow-lg"
+                <a
+                  href={getWhatsAppConfirmationUrl(completedRecord)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 transition-transform hover:scale-105 cursor-pointer shadow-lg"
                 >
-                  <MessageCircle className="w-4 h-4" />
-                  <span>স্ক্রিনশটসহ হোয়াটসঅ্যাপে পাঠান (01805-743666)</span>
-                </button>
+                  <MessageCircle className="w-4.5 h-4.5" />
+                  <span>সরাসরি হোয়াটসঅ্যাপে পাঠান (01805-743666)</span>
+                </a>
+
+                {completedRecord.paymentScreenshot && (
+                  <button
+                    type="button"
+                    onClick={() => copyScreenshotImageToClipboard(completedRecord.paymentScreenshot!)}
+                    className="px-4 py-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer border border-slate-300"
+                  >
+                    {copiedScreenshot ? (
+                      <>
+                        <Check className="w-4 h-4 text-emerald-600" />
+                        <span>স্ক্রিনশট ক্লিপবোর্ডে কপি হয়েছে!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4 text-slate-600" />
+                        <span>পেমেন্ট স্ক্রিনশট কপি করুন</span>
+                      </>
+                    )}
+                  </button>
+                )}
 
                 <button
                   type="button"
