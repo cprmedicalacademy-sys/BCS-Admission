@@ -29,8 +29,8 @@ interface AdminPanelModalProps {
   isOpen: boolean;
   onClose: () => void;
   candidates: RegistrationFormData[];
-  onUpdateCandidateStatus: (rollNumber: string, newStatus: 'Confirmed' | 'Pending WhatsApp Confirmation') => void;
-  onDeleteCandidate: (rollNumber: string) => void;
+  onUpdateCandidateStatus: (registrationId: string, newStatus: 'Confirmed' | 'Pending WhatsApp Confirmation') => void;
+  onDeleteCandidate: (registrationId: string) => void;
   onSelectCandidateToViewSlip: (candidate: RegistrationFormData) => void;
 }
 
@@ -50,7 +50,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
 
   // Filter & Search states
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterMode, setFilterMode] = useState<'all' | 'pending' | 'confirmed' | 'bkash' | 'cash'>('all');
+  const [filterMode, setFilterMode] = useState<'all' | 'pending' | 'confirmed' | 'bkash' | 'cash' | 'offline' | 'online'>('all');
 
   if (!isOpen) return null;
 
@@ -79,7 +79,6 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
       c.fullName.toLowerCase().includes(term) ||
       c.whatsappNumber.includes(term) ||
       (c.bmdcNumber && c.bmdcNumber.toLowerCase().includes(term)) ||
-      (c.rollNumber && c.rollNumber.toLowerCase().includes(term)) ||
       (c.registrationId && c.registrationId.toLowerCase().includes(term)) ||
       (c.transactionId && c.transactionId.toLowerCase().includes(term)) ||
       (c.cashReceivedBy && c.cashReceivedBy.toLowerCase().includes(term));
@@ -98,6 +97,12 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
     if (filterMode === 'cash') {
       return c.paymentMethod === 'Cash (Campus / Offline)';
     }
+    if (filterMode === 'offline') {
+      return !c.examMode || c.examMode.includes('Offline');
+    }
+    if (filterMode === 'online') {
+      return c.examMode && c.examMode.includes('Online');
+    }
 
     return true;
   });
@@ -106,7 +111,12 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
   const totalCount = candidates.length;
   const confirmedCount = candidates.filter((c) => c.status === 'Confirmed').length;
   const pendingCount = totalCount - confirmedCount;
-  const totalRevenue = candidates.reduce((sum, c) => sum + (c.amount || 1499), 0);
+  const offlineCount = candidates.filter((c) => !c.examMode || c.examMode.includes('Offline')).length;
+  const onlineCount = candidates.filter((c) => c.examMode && c.examMode.includes('Online')).length;
+  const totalRevenue = candidates.reduce(
+    (sum, c) => sum + (c.amount || (c.examMode?.includes('Online') ? 599 : 1499)),
+    0
+  );
   const bkashCount = candidates.filter(
     (c) => c.paymentMethod === 'bKash (Online)' || (c.paymentMethod as string) === 'bKash'
   ).length;
@@ -115,7 +125,6 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
   // Export to CSV
   const handleExportCSV = () => {
     const headers = [
-      'Roll Number',
       'Registration ID',
       'Full Name',
       'WhatsApp Number',
@@ -135,7 +144,6 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
     ];
 
     const rows = candidates.map((c) => [
-      c.rollNumber || '',
       c.registrationId || '',
       `"${c.fullName.replace(/"/g, '""')}"`,
       c.whatsappNumber || '',
@@ -329,7 +337,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                   ৳ {totalRevenue.toLocaleString()}
                 </div>
                 <div className="text-[10px] text-blue-700 mt-0.5">
-                  @ ৳ 1499 per head
+                  Offline: {offlineCount} · Online: {onlineCount}
                 </div>
               </div>
             </div>
@@ -344,7 +352,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                 </div>
                 <input
                   type="text"
-                  placeholder="Search by Name, Roll, WhatsApp, TrxID, Cash Receiver..."
+                  placeholder="Search by Name, Reg ID, WhatsApp, TrxID, Cash Receiver..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 text-slate-900 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/20"
@@ -382,6 +390,26 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                   }`}
                 >
                   Confirmed ({confirmedCount})
+                </button>
+                <button
+                  onClick={() => setFilterMode('offline')}
+                  className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                    filterMode === 'offline'
+                      ? 'bg-blue-900 text-white'
+                      : 'text-blue-900 hover:bg-blue-50'
+                  }`}
+                >
+                  Offline ({offlineCount})
+                </button>
+                <button
+                  onClick={() => setFilterMode('online')}
+                  className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                    filterMode === 'online'
+                      ? 'bg-teal-700 text-white'
+                      : 'text-teal-800 hover:bg-teal-50'
+                  }`}
+                >
+                  Online ({onlineCount})
                 </button>
                 <button
                   onClick={() => setFilterMode('bkash')}
@@ -423,7 +451,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                 <table className="w-full text-left border-collapse text-xs">
                   <thead className="bg-slate-100/90 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider sticky top-0 z-10">
                     <tr>
-                      <th className="py-3 px-3.5 whitespace-nowrap">Roll &amp; Reg ID</th>
+                      <th className="py-3 px-3.5 whitespace-nowrap">রেজিস্ট্রেশন আইডি (৮ ডিজিট)</th>
                       <th className="py-3 px-3.5">Candidate Name</th>
                       <th className="py-3 px-3.5">Contact (WhatsApp)</th>
                       <th className="py-3 px-3.5">Medical College</th>
@@ -442,18 +470,18 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
 
                         return (
                           <tr
-                            key={candidate.rollNumber || candidate.whatsappNumber}
+                            key={candidate.registrationId || candidate.whatsappNumber}
                             className={`hover:bg-sky-50/50 transition-colors ${
                               isConfirmed ? 'bg-white' : 'bg-amber-50/20'
                             }`}
                           >
-                            {/* Roll & Reg ID */}
+                            {/* Registration ID (8-digit) */}
                             <td className="py-3 px-3.5 whitespace-nowrap font-mono">
-                              <div className="font-black text-blue-950 text-sm">
-                                {candidate.rollNumber}
-                              </div>
-                              <div className="text-[10px] text-slate-400">
+                              <div className="font-black text-blue-950 text-sm tracking-wider">
                                 {candidate.registrationId}
+                              </div>
+                              <div className="text-[10px] text-cyan-800 font-sans font-semibold">
+                                ৮ সংখ্যার আইডি
                               </div>
                             </td>
 
@@ -503,7 +531,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                                   {isBkash ? 'bKash' : 'Cash'}
                                 </span>
                                 <span className="font-bold text-slate-900 font-mono">
-                                  ৳ {candidate.amount || 1499}
+                                  ৳ {candidate.amount || (candidate.examMode?.includes('Online') ? 599 : 1499)}
                                 </span>
                               </div>
 
@@ -521,7 +549,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                                       onClick={() =>
                                         setAdminPreviewImage({
                                           src: candidate.paymentScreenshot!,
-                                          title: `Dr. ${candidate.fullName} - বিকাশ পেমেন্ট স্ক্রিনশট (Roll: ${candidate.rollNumber})`,
+                                          title: `Dr. ${candidate.fullName} - বিকাশ পেমেন্ট স্ক্রিনশট (Reg ID: ${candidate.registrationId})`,
                                         })
                                       }
                                       className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-pink-100 hover:bg-pink-200 text-pink-900 font-sans font-bold text-[10px] cursor-pointer transition-colors shadow-2xs mt-0.5"
@@ -545,7 +573,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                                 <button
                                   onClick={() =>
                                     onUpdateCandidateStatus(
-                                      candidate.rollNumber!,
+                                      candidate.registrationId!,
                                       'Pending WhatsApp Confirmation'
                                     )
                                   }
@@ -558,7 +586,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                               ) : (
                                 <button
                                   onClick={() =>
-                                    onUpdateCandidateStatus(candidate.rollNumber!, 'Confirmed')
+                                    onUpdateCandidateStatus(candidate.registrationId!, 'Confirmed')
                                   }
                                   title="Click to confirm seat"
                                   className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-bold text-[10px] cursor-pointer hover:bg-amber-200 transition-colors animate-pulse"
@@ -574,7 +602,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                               <div className="flex items-center justify-end gap-1.5">
                                 {/* WhatsApp Candidate */}
                                 <a
-                                  href={`https://wa.me/88${candidate.whatsappNumber.replace(/\D/g, '')}?text=Hello%20Dr.%20${encodeURIComponent(candidate.fullName)},%20Greetings%20from%20CPR%20Medical%20Academy.%20Regarding%20your%20Special%20BCS%20Registration%20(Roll:%20${candidate.rollNumber}).`}
+                                  href={`https://wa.me/88${candidate.whatsappNumber.replace(/\D/g, '')}?text=Hello%20Dr.%20${encodeURIComponent(candidate.fullName)},%20Greetings%20from%20CPR%20Medical%20Academy.%20Regarding%20your%20Special%20BCS%20Registration%20(Reg%20ID:%20${candidate.registrationId}).`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors"
@@ -599,8 +627,8 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                                 {/* Delete Candidate */}
                                 <button
                                   onClick={() => {
-                                    if (window.confirm(`Are you sure you want to delete ${candidate.fullName} (Roll: ${candidate.rollNumber})?`)) {
-                                      onDeleteCandidate(candidate.rollNumber!);
+                                    if (window.confirm(`Are you sure you want to delete ${candidate.fullName} (Reg ID: ${candidate.registrationId})?`)) {
+                                      onDeleteCandidate(candidate.registrationId!);
                                     }
                                   }}
                                   className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"

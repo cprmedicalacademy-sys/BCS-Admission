@@ -29,9 +29,9 @@ export const RegistrationLookupModal: React.FC<RegistrationLookupModalProps> = (
     const matched = allCandidates.filter((c) => {
       const matchBmdc = c.bmdcNumber ? c.bmdcNumber.toLowerCase().includes(term) : false;
       const matchPhone = c.whatsappNumber.includes(term);
-      const matchRoll = c.rollNumber ? c.rollNumber.toLowerCase().includes(term) : false;
+      const matchRegId = c.registrationId ? c.registrationId.toLowerCase().includes(term) : false;
       const matchName = c.fullName.toLowerCase().includes(term);
-      return matchBmdc || matchPhone || matchRoll || matchName;
+      return matchBmdc || matchPhone || matchRegId || matchName;
     });
 
     setSearchResult(matched);
@@ -60,7 +60,7 @@ export const RegistrationLookupModal: React.FC<RegistrationLookupModalProps> = (
             Verify Registration &amp; Download Slip
           </h3>
           <p className="text-xs sm:text-sm text-slate-600">
-            Enter your BMDC Registration Number, WhatsApp phone, or Roll Number to retrieve your official admission card.
+            আপনার ৮ সংখ্যার রেজিস্ট্রেশন আইডি (Registration ID), হোয়াটসঅ্যাপ নম্বর বা BMDC নম্বর দিয়ে ক্যান্ডিডেট স্লিপটি বের করুন।
           </p>
         </div>
 
@@ -73,7 +73,7 @@ export const RegistrationLookupModal: React.FC<RegistrationLookupModalProps> = (
             <input
               type="text"
               autoFocus
-              placeholder="e.g. A-92834 or 01711223344 or 241012"
+              placeholder="e.g. 26344051 or 01711223344 or A-92834"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-24 py-3 rounded-xl border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all font-mono-numbers"
@@ -87,25 +87,25 @@ export const RegistrationLookupModal: React.FC<RegistrationLookupModalProps> = (
           </div>
 
           <div className="flex items-center gap-2 text-[11px] text-slate-400">
-            <span>Try pre-registered demo doctors:</span>
+            <span>ডেমো আইডি দিয়ে ট্রাই করুন:</span>
             <button
               type="button"
               onClick={() => {
-                setSearchTerm('A-92834');
+                setSearchTerm('26344051');
               }}
-              className="text-cyan-700 underline font-mono cursor-pointer"
+              className="text-cyan-700 underline font-mono cursor-pointer font-bold"
             >
-              A-92834
+              26344051
             </button>
             <span>·</span>
             <button
               type="button"
               onClick={() => {
-                setSearchTerm('A-104921');
+                setSearchTerm('26455052');
               }}
-              className="text-cyan-700 underline font-mono cursor-pointer"
+              className="text-cyan-700 underline font-mono cursor-pointer font-bold"
             >
-              A-104921
+              26455052
             </button>
           </div>
         </form>
@@ -116,7 +116,7 @@ export const RegistrationLookupModal: React.FC<RegistrationLookupModalProps> = (
             {searchResult && searchResult.length > 0 ? (
               searchResult.map((c) => (
                 <div
-                  key={c.rollNumber || c.whatsappNumber}
+                  key={c.registrationId || c.whatsappNumber}
                   className="p-4 rounded-xl border border-sky-100 bg-sky-50/50 hover:bg-sky-50 flex items-center justify-between gap-4 transition-colors"
                 >
                   <div className="space-y-1">
@@ -129,7 +129,7 @@ export const RegistrationLookupModal: React.FC<RegistrationLookupModalProps> = (
                       </span>
                     </div>
                     <div className="text-xs text-slate-600 flex items-center gap-2 font-mono-numbers">
-                      <span>Roll: <strong>{c.rollNumber}</strong></span>
+                      <span>Reg ID: <strong className="text-blue-950 font-bold">{c.registrationId}</strong></span>
                       <span>·</span>
                       <span>BMDC: <strong>{c.bmdcNumber || 'Intern / N/A'}</strong></span>
                     </div>

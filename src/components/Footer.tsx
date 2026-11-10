@@ -89,20 +89,20 @@ export const Footer: React.FC<FooterProps> = ({ onRegisterClick, onLookupClick, 
               Online Candidate Portal
             </h4>
             <p className="text-xs text-slate-400">
-              Special BCS: মূল ভর্তি ফি <strong>৳ ১৪৯৯/-</strong>। ইতিমধ্যে ৫৪ জন সম্মানিত ডাক্তার ভর্তি সম্পন্ন করেছেন।
+              Special BCS: অফলাইন ভর্তি ফি <strong>৳ ১৪৯৯/-</strong> (অফার সমাপ্ত, ৫৪+ জন ভর্তি) | অনলাইন <strong>৳ ৫৯৯/-</strong> (১ম ২০ জন অফার, মূল ৳ ৭৯৯)।
             </p>
             <div className="pt-2 flex flex-col gap-2">
               <button
                 onClick={onRegisterClick}
                 className="w-full py-2.5 px-4 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold text-xs text-center transition-colors cursor-pointer"
               >
-                Register Online · ৳ ১৪৯৯
+                Register Now · অফলাইন ৳ ১৪৯৯ | অনলাইন ৳ ৫৯৯
               </button>
               <button
                 onClick={onLookupClick}
                 className="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs text-center border border-slate-700 transition-colors cursor-pointer"
               >
-                Verify Roll &amp; Download Admission Slip
+                Verify Registration ID &amp; Download Slip
               </button>
             </div>
           </div>

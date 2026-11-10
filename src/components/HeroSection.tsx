@@ -61,51 +61,107 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               </p>
             </div>
 
-            {/* Price Lockup Box (Regular Price 1499, 54 Enrolled) */}
-            <div className="p-5 sm:p-6 rounded-2xl bg-white/95 border border-sky-100 shadow-[0_10px_30px_-5px_rgba(15,23,42,0.06)] relative overflow-hidden backdrop-blur-sm">
+            {/* Dual Price Lockup Box (OFFLINE & ONLINE) */}
+            <div className="p-5 sm:p-6 rounded-2xl bg-white/95 border border-sky-100 shadow-[0_10px_30px_-5px_rgba(15,23,42,0.06)] relative overflow-hidden backdrop-blur-sm space-y-4">
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-cyan-100/60 to-transparent rounded-bl-full pointer-events-none" />
-              
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
-                <div>
-                  <div className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                    মূল পরীক্ষা ও ভর্তি ফি (Regular Admission Fee)
+
+              {/* Header with Already Enrolled Count */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="inline-flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-800">
+                    স্পেশাল বিসিএস কোর্স ও ভর্তি ফি (Offline &amp; Online)
+                  </span>
+                </div>
+                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-900 bg-emerald-50 border border-emerald-300 px-3 py-1 rounded-lg w-fit">
+                  <Users className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>ইতিমধ্যে ৫৪ জন ভর্তি সম্পন্ন</span>
+                </div>
+              </div>
+
+              {/* Dual Pricing Grid: OFFLINE vs ONLINE */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+                {/* 1. OFFLINE Track */}
+                <div className="p-4 rounded-xl bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white relative overflow-hidden border border-cyan-500/30 shadow-md">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="px-2.5 py-0.5 rounded-md bg-cyan-500 text-slate-950 font-black text-[11px] tracking-wider uppercase">
+                      OFFLINE
+                    </span>
+                    <span className="text-[10px] font-bold text-slate-300 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
+                      চকবাজার ক্যাম্পাস
+                    </span>
                   </div>
-                  <div className="flex items-baseline gap-3 mt-1">
-                    <span className="text-3xl sm:text-4xl font-extrabold font-display text-blue-950 font-mono-numbers">
-                      ৳ ১৪৯৯/-
-                    </span>
-                    <span className="text-xs font-bold text-slate-600 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-md">
-                      ১০টি পরীক্ষা অল-ইনক্লুসিভ
-                    </span>
+
+                  <div className="mt-3">
+                    <div className="text-[11px] text-slate-400">
+                      মূল ভর্তি ফি:
+                    </div>
+                    <div className="flex items-baseline gap-2 mt-0.5">
+                      <span className="text-2xl sm:text-3xl font-black font-display text-white font-mono-numbers">
+                        ৳ ১৪৯৯/-
+                      </span>
+                      <span className="text-[10px] font-bold text-amber-300 bg-amber-950/90 px-2 py-0.5 rounded border border-amber-500/40">
+                        অফার সমাপ্ত
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-2 text-xs font-bold text-slate-300 flex items-center gap-1">
+                    <span>⚠️ অফার শেষ (৫৪+ জন ভর্তি সম্পন্ন)</span>
+                  </div>
+                  <div className="mt-1 text-[11px] text-slate-300 leading-tight">
+                    চকবাজার মতি টাওয়ারে ওএমআর পরীক্ষা, প্রিন্টেড প্রশ্ন ও সল্যুশন বুকলেট
                   </div>
                 </div>
 
-                {/* Already Enrolled 54 Badge */}
-                <div className="sm:text-right">
-                  <div className="inline-flex items-center gap-2 text-xs font-bold text-emerald-900 bg-emerald-50 border border-emerald-300 px-3 py-1.5 rounded-lg shadow-xs">
-                    <Users className="w-4 h-4 text-emerald-600" />
-                    <span>ইতিমধ্যে ৫৪ জন ভর্তি সম্পন্ন</span>
+                {/* 2. ONLINE Track */}
+                <div className="p-4 rounded-xl bg-gradient-to-br from-cyan-900 via-teal-950 to-slate-900 text-white relative overflow-hidden border border-teal-400/30 shadow-md">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="px-2.5 py-0.5 rounded-md bg-emerald-400 text-slate-950 font-black text-[11px] tracking-wider uppercase">
+                      ONLINE
+                    </span>
+                    <span className="text-[10px] font-bold text-teal-200 bg-teal-950/80 px-2 py-0.5 rounded border border-teal-400/40">
+                      সারা বাংলাদেশ
+                    </span>
                   </div>
-                  <div className="text-xs text-slate-500 mt-1">
-                    চকবাজার মতি টাওয়ার ক্যাম্পাস, চট্টগ্রাম
+
+                  <div className="mt-3">
+                    <div className="text-[11px] text-slate-300 line-through">
+                      মূল ফি: ৳ ৭৯৯/-
+                    </div>
+                    <div className="flex items-baseline gap-2 mt-0.5">
+                      <span className="text-2xl sm:text-3xl font-black font-display text-white font-mono-numbers">
+                        ৳ ৫৯৯/-
+                      </span>
+                      <span className="text-[11px] font-bold text-emerald-300 bg-emerald-950/90 px-2 py-0.5 rounded border border-emerald-500/40">
+                        ৳ ২০০ ছাড়
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-2 text-xs font-bold text-amber-300 flex items-center gap-1">
+                    <span>⚡ ১ম ২০জনের জন্য ৫৯৯/- অফার চলছে!</span>
+                  </div>
+                  <div className="mt-1 text-[11px] text-slate-300 leading-tight">
+                    মোবাইল/ল্যাপটপে লাইভ পরীক্ষা, ডিজিটাল পিডিএফ প্রশ্ন ও সল্যুশন
                   </div>
                 </div>
               </div>
 
-              {/* Real-time Enrolled Status */}
-              <div className="pt-3 space-y-1.5">
-                <div className="flex justify-between items-center text-xs font-medium text-slate-700 font-mono-numbers">
+              {/* Progress & Guarantee Bar */}
+              <div className="pt-1 space-y-1.5">
+                <div className="flex justify-between items-center text-xs font-medium text-slate-700">
                   <span className="flex items-center gap-1.5 font-bold text-slate-800">
                     <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span>ইতিমধ্যে ৫৪ জন সম্মানিত চিকিৎসক ভর্তি হয়েছেন</span>
+                    <span>১০টি পূর্ণাঙ্গ পরীক্ষা (৮টি সাবজেক্ট ফাইনাল + ২টি গ্র্যান্ড মক)</span>
                   </span>
-                  <span className="text-blue-900 font-bold">
-                    ভর্তি ফি ৳ ১৪৯৯/-
+                  <span className="text-blue-900 font-bold font-mono-numbers">
+                    বিকাল ৩:০০ টা
                   </span>
                 </div>
-                <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
                   <div
-                    className="bg-gradient-to-r from-cyan-500 via-blue-600 to-emerald-600 h-2.5 rounded-full transition-all duration-500 w-[54%]"
+                    className="bg-gradient-to-r from-cyan-500 via-blue-600 to-emerald-600 h-2 rounded-full w-[54%]"
                   />
                 </div>
               </div>
@@ -120,8 +176,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               >
                 <span className="flex items-center gap-2">
                   <span>REGISTER NOW</span>
-                  <span className="bg-white/20 text-white text-xs px-2 py-0.5 rounded font-mono-numbers">
-                    ৳ ১৪৯৯
+                  <span className="bg-white/20 text-white text-xs px-2 py-0.5 rounded font-mono-numbers font-extrabold">
+                    অফলাইন ৳ ১৪৯৯ | অনলাইন ৳ ৫৯৯
                   </span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </span>

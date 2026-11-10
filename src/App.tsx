@@ -72,21 +72,21 @@ export default function App() {
 
   // Update candidate status in Admin Panel (e.g. Confirm Seat / Mark Pending)
   const handleUpdateCandidateStatus = (
-    rollNumber: string,
+    registrationId: string,
     newStatus: 'Confirmed' | 'Pending WhatsApp Confirmation'
   ) => {
     setCandidates((prev) =>
-      prev.map((c) => (c.rollNumber === rollNumber ? { ...c, status: newStatus } : c))
+      prev.map((c) => (c.registrationId === registrationId ? { ...c, status: newStatus } : c))
     );
-    if (selectedCandidate && selectedCandidate.rollNumber === rollNumber) {
+    if (selectedCandidate && selectedCandidate.registrationId === registrationId) {
       setSelectedCandidate((prev) => (prev ? { ...prev, status: newStatus } : null));
     }
   };
 
   // Delete candidate from Admin Panel
-  const handleDeleteCandidate = (rollNumber: string) => {
-    setCandidates((prev) => prev.filter((c) => c.rollNumber !== rollNumber));
-    if (selectedCandidate && selectedCandidate.rollNumber === rollNumber) {
+  const handleDeleteCandidate = (registrationId: string) => {
+    setCandidates((prev) => prev.filter((c) => c.registrationId !== registrationId));
+    if (selectedCandidate && selectedCandidate.registrationId === registrationId) {
       setSelectedCandidate(null);
     }
   };
@@ -144,7 +144,7 @@ export default function App() {
         onAdminClick={() => setIsAdminOpen(true)}
       />
 
-      {/* Candidate Roll Lookup Modal */}
+      {/* Candidate Registration ID Lookup Modal */}
       <RegistrationLookupModal
         isOpen={isLookupOpen}
         onClose={() => setIsLookupOpen(false)}

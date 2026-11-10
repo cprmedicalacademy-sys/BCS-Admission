@@ -18,12 +18,12 @@ export const FAQSection: React.FC = () => {
       a: "Yes, absolutely! The exam portal is mobile-optimized and accessible from all 64 districts. Tests remain open for 24 hours on exam days so doctors on hospital duty or emergency shifts can sit at their convenient time."
     },
     {
-      q: "What does the ৳ 1499 admission package include?",
-      a: "The all-inclusive ৳ 1499 package covers 8 Subject Final Examinations, 2 Full-length Grand Mocks (200 marks each, 3:00 PM), complete question explanation booklets with rationale, All-Bangladesh Merit Ranking, and direct admission into the official WhatsApp cadre guidance group."
+      q: "অফলাইন ও অনলাইন কোর্সের ফি কত এবং এর মধ্যে কী কী অন্তর্ভুক্ত রয়েছে?",
+      a: "আমাদের অফলাইন চকবাজার ক্যাম্পাস প্রোগ্রামের মূল ফি ৳ ১৪৯৯/-। ইতিমধ্যে ৫৪+ জন ভর্তি সম্পন্ন হওয়ায় অফলাইন ব্যাচের অফার শেষ হয়ে বর্তমানে মূল ফি ৳ ১৪৯৯/- প্রযোজ্য (সরাসরি ওএমআর পরীক্ষা, প্রিন্টেড প্রশ্ন ও সল্যুশন বুকলেট)। অন্যদিকে, সারা দেশের চিকিৎসকদের জন্য অনলাইন প্রোগ্রামের মূল ফি ৳ ৭৯৯/-, তবে প্রথম ২০ জনের জন্য বিশেষ অফার ফি ৳ ৫৯৯/- (অনলাইন টেস্ট পোর্টাল ও পিডিএফ বুকলেট)। উভয় কোর্সেই ৮টি সাবজেক্ট ফাইনাল, ২টি ২০০ নম্বরের গ্র্যান্ড মক এবং অল-বাংলাদেশ মেরিট লিস্ট অন্তর্ভুক্ত।"
     },
     {
-      q: "How soon do I receive my Roll Number and batch access?",
-      a: "Your Roll Number and printable Candidate Admission Slip are generated immediately upon completing the online admission form with your Transaction ID. You will also be onboarded into the official WhatsApp batch within 6 hours."
+      q: "How soon do I receive my 8-Digit Registration ID and batch access?",
+      a: "Your official 8-digit Registration ID (e.g. 26XXXXXX) and printable Candidate Admission Slip are generated immediately upon completing the admission form. You can send the slip directly to our official WhatsApp (01805-743666), and your seat will be confirmed promptly."
     }
   ];
 
