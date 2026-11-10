@@ -114,7 +114,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
   const offlineCount = candidates.filter((c) => !c.examMode || c.examMode.includes('Offline')).length;
   const onlineCount = candidates.filter((c) => c.examMode && c.examMode.includes('Online')).length;
   const totalRevenue = candidates.reduce(
-    (sum, c) => sum + (c.amount || (c.examMode?.includes('Online') ? 599 : 1499)),
+    (sum, c) => sum + (c.amount || (c.examMode?.includes('Online') ? 799 : 1499)),
     0
   );
   const bkashCount = candidates.filter(
@@ -531,7 +531,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                                   {isBkash ? 'bKash' : 'Cash'}
                                 </span>
                                 <span className="font-bold text-slate-900 font-mono">
-                                  ৳ {candidate.amount || (candidate.examMode?.includes('Online') ? 599 : 1499)}
+                                  ৳ {candidate.amount || (candidate.examMode?.includes('Online') ? 799 : 1499)}
                                 </span>
                               </div>
 

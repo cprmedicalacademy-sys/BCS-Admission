@@ -180,7 +180,7 @@ export const CourseHighlights: React.FC<CourseHighlightsProps> = ({ onRegisterCl
               Ready to Secure Your Name on the Special BCS Cadre Merit List?
             </div>
             <div className="text-xs sm:text-sm text-slate-300 max-w-xl">
-              অফলাইন ভর্তি ফি: <strong>৳ ১৪৯৯/-</strong> (অফার সমাপ্ত, ৫৪+ জন ভর্তি) | অনলাইন বিশেষ অফার: <strong>৳ ৫৯৯/-</strong> (মূল ৳ ৭৯৯, ১ম ২০ জনের জন্য)।
+              অফলাইন ভর্তি ফি: <strong>৳ ১৪৯৯/-</strong> (অফার সমাপ্ত, ৫৪+ জন ভর্তি) | অনলাইন ভর্তি ফি: <strong>৳ ৭৯৯/-</strong> (অফার সমাপ্ত, ৩২+ জন ভর্তি)।
             </div>
           </div>
 
@@ -189,7 +189,7 @@ export const CourseHighlights: React.FC<CourseHighlightsProps> = ({ onRegisterCl
             className="shrink-0 px-8 py-3.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-sm shadow-md transition-all duration-200 hover:-translate-y-0.5 cursor-pointer flex items-center gap-2 whitespace-nowrap"
           >
             <span>APPLY FOR ADMISSION</span>
-            <span className="text-xs font-mono-numbers bg-red-800 px-2 py-0.5 rounded font-bold">অফলাইন ৳ ১৪৯৯ | অনলাইন ৳ ৫৯৯</span>
+            <span className="text-xs font-mono-numbers bg-red-800 px-2 py-0.5 rounded font-bold">অফলাইন ৳ ১৪৯৯ | অনলাইন ৳ ৭৯৯</span>
           </button>
         </div>
 

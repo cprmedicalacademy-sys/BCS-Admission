@@ -77,8 +77,8 @@ export const AdmissionForm: React.FC<AdmissionFormProps> = ({
 
   const handleModeChange = (mode: 'Offline Campus (Chittagong Center)' | 'Online Exam Portal (National)') => {
     const isOnline = mode === 'Online Exam Portal (National)';
-    // Offline offer is over (1499), online offer is active (599, regular 799)
-    const newAmount = isOnline ? 599 : 1499;
+    // Both Offline (54+) and Online (32+) offers ended; full fees apply:
+    const newAmount = isOnline ? 799 : 1499;
     setFormData((prev) => ({
       ...prev,
       examMode: mode,
@@ -233,7 +233,7 @@ export const AdmissionForm: React.FC<AdmissionFormProps> = ({
   const generateSlipMessage = (record: RegistrationFormData) => {
     const isOnline = record.examMode === 'Online Exam Portal (National)';
     const regularPrice = isOnline ? 799 : 1499;
-    const paidAmount = record.amount || (isOnline ? 599 : 1499);
+    const paidAmount = record.amount || (isOnline ? 799 : 1499);
 
     const paymentDetail = record.paymentMethod === 'bKash (Online)'
       ? `বিকাশ অনলাইন (Send Money ৳ ${paidAmount}${record.paymentScreenshot ? ', স্ক্রিনশট সংযুক্ত ✅' : ''}${record.transactionId ? `, TrxID: ${record.transactionId}` : ''}${record.senderNumber ? `, প্রেরক: ${record.senderNumber}` : ''})`
@@ -250,7 +250,7 @@ ${record.altMobileNumber ? `📞 বিকল্প নম্বর: ${record.al
 ⏰ *পরীক্ষার সময়:* 3:00 PM (প্রতি পরীক্ষা বিকাল ৩:০০ টায়)
 📍 *অংশগ্রহণের মোড:* ${record.examMode}
 💳 *পেমেন্ট পদ্ধতি:* ${paymentDetail}
-${record.paymentScreenshot ? '📷 *পেমেন্ট প্রুফ:* বিকাশ সেন্ড মানির স্ক্রিনশট পোর্টালে আপলোড করা হয়েছে।\n' : ''}💵 *পরিশোধিত কোর্স ফি:* ৳ ${paidAmount}/- (${isOnline ? 'অনলাইন ১ম ২০ জন অফার, নিয়মিত ৳ ৭৯৯/-' : 'অফলাইন নিয়মিত ফি (৫৪+ ভর্তি সম্পন্ন, অফার সমাপ্ত)'})
+${record.paymentScreenshot ? '📷 *পেমেন্ট প্রুফ:* বিকাশ সেন্ড মানির স্ক্রিনশট পোর্টালে আপলোড করা হয়েছে।\n' : ''}💵 *পরিশোধিত কোর্স ফি:* ৳ ${paidAmount}/- (${isOnline ? 'অনলাইন নিয়মিত ফি (৩২+ ভর্তি সম্পন্ন, অফার সমাপ্ত)' : 'অফলাইন নিয়মিত ফি (৫৪+ ভর্তি সম্পন্ন, অফার সমাপ্ত)'})
 📅 *আবেদনের তারিখ:* ${record.registrationDate || new Date().toISOString().split('T')[0]}
 ──────────────────────
 আসসালামু আলাইকুম CPR একাডেমি কর্তৃপক্ষ,
@@ -374,7 +374,7 @@ ${record.paymentScreenshot ? '📷 *পেমেন্ট প্রুফ:* ব�
     e.preventDefault();
     if (validateStep2()) {
       const isOnline = formData.examMode === 'Online Exam Portal (National)';
-      const finalAmount = isOnline ? 599 : 1499;
+      const finalAmount = isOnline ? 799 : 1499;
       // 8-Digit Registration ID Generator: 26 + phoneLast3 + sequential serial
       const generatedRegId = generateRegistrationId(formData.whatsappNumber);
 
@@ -740,11 +740,11 @@ ${record.paymentScreenshot ? '📷 *পেমেন্ট প্রুফ:* ব�
                       প্রযোজ্য ভর্তি ফি
                     </div>
                     <div className="text-2xl font-black text-blue-900 font-mono-numbers">
-                      ৳ {formData.examMode === 'Online Exam Portal (National)' ? '৫৯৯' : '১৪৯৯'}/-
+                      ৳ {formData.examMode === 'Online Exam Portal (National)' ? '৭৯৯' : '১৪৯৯'}/-
                     </div>
-                    <div className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 mt-0.5">
+                    <div className="text-[11px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 mt-0.5">
                       {formData.examMode === 'Online Exam Portal (National)'
-                        ? 'অনলাইন ১ম ২০ জন অফার (মূল ফি ৳ ৭৯৯)'
+                        ? 'অনলাইন নিয়মিত ফি (৩২+ ভর্তি সম্পন্ন, অফার সমাপ্ত)'
                         : 'অফলাইন নিয়মিত ফি (৫৪+ ভর্তি সম্পন্ন, অফার সমাপ্ত)'}
                     </div>
                   </div>
@@ -758,7 +758,7 @@ ${record.paymentScreenshot ? '📷 *পেমেন্ট প্রুফ:* ব�
                     Exam Participation Mode (অংশগ্রহণের মাধ্যম নির্বাচন করুন) <span className="text-red-500">*</span>
                   </label>
                   <span className="text-[11px] font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full w-fit">
-                    ⚡ অনলাইন ব্যাচে ১ম ২০ জনের বিশেষ অফার কার্যকর (অফলাইন অফার সমাপ্ত)
+                    ⚠️ অফলাইন ও অনলাইন উভয় ব্যাচেই অফার সমাপ্ত (মোট ৮৬+ জন ভর্তি সম্পন্ন)
                   </span>
                 </div>
 
@@ -824,15 +824,15 @@ ${record.paymentScreenshot ? '📷 *পেমেন্ট প্রুফ:* ব�
                     </div>
 
                     <div className="mt-2.5">
-                      <div className="text-xs text-slate-400 line-through">
-                        মূল ফি: ৳ ৭৯৯/-
+                      <div className="text-xs text-slate-500">
+                        মূল ভর্তি ফি:
                       </div>
                       <div className="flex items-baseline gap-2 mt-0.5">
                         <span className="text-2xl font-black text-teal-950 font-mono-numbers">
-                          ৳ ৫৯৯/-
+                          ৳ ৭৯৯/-
                         </span>
-                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded border border-emerald-300">
-                          ১ম ২০ জনের জন্য ৫৯৯/-
+                        <span className="text-[10px] font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-300">
+                          অফার সমাপ্ত (৩২+ ভর্তি)
                         </span>
                       </div>
                     </div>
@@ -855,7 +855,7 @@ ${record.paymentScreenshot ? '📷 *পেমেন্ট প্রুফ:* ব�
                     <span>পরীক্ষার সময়: প্রতিদিন বিকাল ৩:০০ টায় (3:00 PM)</span>
                   </span>
                   <span className="text-blue-900 font-mono-numbers">
-                    নির্বাচিত: {formData.examMode === 'Online Exam Portal (National)' ? 'অনলাইন (৳ ৫৯৯ - ১ম ২০ জন অফার)' : 'অফলাইন (৳ ১৪৯৯ - নিয়মিত ফি)'}
+                    নির্বাচিত: {formData.examMode === 'Online Exam Portal (National)' ? 'অনলাইন (৳ ৭৯৯ - নিয়মিত ফি)' : 'অফলাইন (৳ ১৪৯৯ - নিয়মিত ফি)'}
                   </span>
                 </div>
               </div>
@@ -889,7 +889,7 @@ ${record.paymentScreenshot ? '📷 *পেমেন্ট প্রুফ:* ব�
                         Send Money to +880 1675-226753
                       </div>
                       <div className="text-[11px] font-semibold text-pink-700 mt-1 font-mono-numbers">
-                        ৳ {formData.examMode === 'Online Exam Portal (National)' ? '৫৯৯' : '১৪৯৯'} (Send Money &amp; Screenshot)
+                        ৳ {formData.examMode === 'Online Exam Portal (National)' ? '৭৯৯' : '১৪৯৯'} (Send Money &amp; Screenshot)
                       </div>
                     </div>
                   </button>
@@ -915,7 +915,7 @@ ${record.paymentScreenshot ? '📷 *পেমেন্ট প্রুফ:* ব�
                         চকবাজার ক্যাম্পাসে বা মেন্টরের কাছে জমা
                       </div>
                       <div className="text-[11px] font-semibold text-emerald-700 mt-1 font-mono-numbers">
-                        ৳ {formData.examMode === 'Online Exam Portal (National)' ? '৫৯৯' : '১৪৯৯'} (টাকা গ্রহণকারীর নাম লিখুন)
+                        ৳ {formData.examMode === 'Online Exam Portal (National)' ? '৭৯৯' : '১৪৯৯'} (টাকা গ্রহণকারীর নাম লিখুন)
                       </div>
                     </div>
                   </button>
@@ -930,7 +930,7 @@ ${record.paymentScreenshot ? '📷 *পেমেন্ট প্রুফ:* ব�
                     <div className="flex items-center justify-between text-xs text-pink-300 font-semibold">
                       <span>bKash Personal Send Money Instructions</span>
                       <span className="font-mono-numbers bg-slate-800 px-2.5 py-0.5 rounded border border-slate-700 text-cyan-200">
-                        Payable: ৳ {formData.examMode === 'Online Exam Portal (National)' ? '599 (অনলাইন ১ম ২০ জন অফার)' : '1499 (অফলাইন নিয়মিত ফি)'}
+                        Payable: ৳ {formData.examMode === 'Online Exam Portal (National)' ? '799 (অনলাইন নিয়মিত ফি)' : '1499 (অফলাইন নিয়মিত ফি)'}
                       </span>
                     </div>
 
@@ -964,7 +964,7 @@ ${record.paymentScreenshot ? '📷 *পেমেন্ট প্রুফ:* ব�
                     <div className="text-xs text-slate-300 leading-relaxed space-y-1">
                       <p>১. আপনার বিকাশ অ্যাপ ওপেন করুন অথবা *247# ডায়াল করুন।</p>
                       <p>২. <strong>Send Money</strong> সিলেক্ট করে নম্বর দিন: <strong className="text-pink-300 font-mono">01675226753</strong></p>
-                      <p>৩. টাকার পরিমাণ দিন: <strong className="text-white font-mono">{formData.examMode === 'Online Exam Portal (National)' ? '599' : '1499'}</strong> (রেফারেন্স: <span className="text-cyan-300">BCS</span>)</p>
+                      <p>৩. টাকার পরিমাণ দিন: <strong className="text-white font-mono">{formData.examMode === 'Online Exam Portal (National)' ? '799' : '1499'}</strong> (রেফারেন্স: <span className="text-cyan-300">BCS</span>)</p>
                       <p>৪. সফলভাবে সেন্ড মানি করার পর ট্রানজেকশনের স্ক্রিনশটটি নিচে আপলোড করুন।</p>
                     </div>
                   </div>
@@ -1134,7 +1134,7 @@ ${record.paymentScreenshot ? '📷 *পেমেন্ট প্রুফ:* ব�
                     <span>ক্যাশ পেমেন্ট ভেরিফিকেশন (Cash Received Information)</span>
                   </div>
                   <p className="text-xs text-emerald-800 leading-relaxed">
-                    চকবাজার মতি টাওয়ার ক্যাম্পাসে বা আমাদের কোনো সম্মানিত মেন্টর/প্রতিনিধির নিকট সরাসরি <strong>৳ {formData.examMode === 'Online Exam Portal (National)' ? '৫৯৯' : '১৪৯৯'}/-</strong> টাকা ক্যাশ জমা দিয়ে থাকলে যিনি টাকা গ্রহণ করেছেন তার নাম লিখুন।
+                    চকবাজার মতি টাওয়ার ক্যাম্পাসে বা আমাদের কোনো সম্মানিত মেন্টর/প্রতিনিধির নিকট সরাসরি <strong>৳ {formData.examMode === 'Online Exam Portal (National)' ? '৭৯৯' : '১৪৯৯'}/-</strong> টাকা ক্যাশ জমা দিয়ে থাকলে যিনি টাকা গ্রহণ করেছেন তার নাম লিখুন।
                   </p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -1430,11 +1430,8 @@ ${record.paymentScreenshot ? '📷 *পেমেন্ট প্রুফ:* ব�
                       <span className="text-slate-500">Admission Fee:</span>
                       <div className="font-bold text-emerald-800 font-mono-numbers flex flex-wrap items-baseline gap-1.5">
                         <span>৳ {completedRecord.amount}/-</span>
-                        <span className="text-[10px] text-slate-500 font-normal line-through">
-                          (মূল ফি ৳ {completedRecord.examMode?.includes('Online') ? '৭৯৯' : '১৪৯৯'})
-                        </span>
-                        <span className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
-                          ১ম ২০ জন অফার
+                        <span className="text-[10px] text-amber-800 font-bold bg-amber-50 px-1.5 py-0.2 rounded border border-amber-200">
+                          {completedRecord.examMode?.includes('Online') ? 'অনলাইন নিয়মিত ফি (৩২+ ভর্তি)' : 'অফলাইন নিয়মিত ফি (৫৪+ ভর্তি)'}
                         </span>
                       </div>
                     </div>

@@ -55,14 +55,14 @@ export const PROGRAM_OPTIONS = {
     titleBengali: "অনলাইন এক্সাম পোর্টাল (সারা বাংলাদেশ)",
     badge: "ONLINE",
     regularPrice: 799,
-    offerPrice: 599, // ১ম ২০ জনের জন্য ৫৯৯/- অফার চালু রয়েছে
-    isOfferActive: true,
-    offerEnded: false,
-    savings: 200,
+    offerPrice: 799, // অফার শেষ (৩২+ জন ভর্তি সম্পন্ন)
+    isOfferActive: false,
+    offerEnded: true,
+    savings: 0,
     offerLimit: 20,
-    offerTag: "প্রথম ২০জনের জন্য ৫৯৯/-",
-    offerStatusText: "অনলাইন ব্যাচে ১ম ২০ জনের জন্য বিশেষ অফার চলমান",
-    badgeText: "🔥 ১ম ২০ জনের জন্য ৫৯৯/- অফার",
+    offerTag: "অফার সমাপ্ত (৩২+ ভর্তি সম্পন্ন)",
+    offerStatusText: "অনলাইন ব্যাচের অফার শেষ (৩২+ জন ভর্তি সম্পন্ন)",
+    badgeText: "অফার সমাপ্ত · মূল ফি ৳ ৭৯৯/-",
     description: "সারা বাংলাদেশ থেকে মোবাইল বা ল্যাপটপে পরীক্ষা দেওয়ার সুবিধা ও ডিজিটাল সল্যুশন",
     features: [
       "সারা বাংলাদেশ থেকে মোবাইল বা ল্যাপটপে পরীক্ষা দেওয়ার সুবিধা",
@@ -83,20 +83,23 @@ export const CAMPAIGN_INFO = {
   campaignTitle: "SPECIAL BCS – CPR MEDICAL ACADEMY",
   campaignSubtitle: "SUBJECT FINALS & GRAND MOCK",
   
-  // Pricing Structure: Offline offer ended (1499), Online offer active (599, reg 799)
+  // Pricing Structure: Both Offline (54+) and Online (32+) offers ended
   offlineRegularPrice: 1499,
-  offlineOfferPrice: 1499, // Offer ended
+  offlineOfferPrice: 1499, // Offer ended (54+ admitted)
   offlineOfferEnded: true,
   onlineRegularPrice: 799,
-  onlineOfferPrice: 599, // Offer active
-  first20OfferOnline: true,
+  onlineOfferPrice: 799, // Offer ended (32+ admitted)
+  onlineOfferEnded: true,
+  first20OfferOnline: false,
 
   regularPrice: 1499,
   offerPrice: 1499,
   coursePrice: 1499,
-  enrolledCount: 54, // ইতিমধ্যে ৫৪ জন ভর্তি সম্পন্ন (অফলাইন অফার কোটা পূর্ণ)
-  maxSeats: 100,
-  claimedSeats: 54,
+  offlineEnrolledCount: 54, // অফলাইন ৫৪ জন ভর্তি সম্পন্ন
+  onlineEnrolledCount: 32, // অনলাইন ৩২ জন ভর্তি সম্পন্ন
+  enrolledCount: 86, // মোট ৮৬+ জন ভর্তি সম্পন্ন (অফলাইন ৫৪+ ও অনলাইন ৩২+)
+  maxSeats: 120,
+  claimedSeats: 86,
   examTime: "3:00 PM",
   bkashNumber: "+880 1675-226753",
   bkashRawNumber: "01675226753",
@@ -115,12 +118,12 @@ export const PAYMENT_CHANNELS = {
     title: "Online Payment (bKash Send Money)",
     type: "bKash Personal",
     number: "01675-226753",
-    instructions: "bKash অ্যাপ বা *247# ডায়াল করে Send Money করুন: 01675226753 নম্বরে। অফলাইন ভর্তি ফি ৳ ১৪৯৯ (অফার সমাপ্ত, ৫৪+ জন ভর্তি) অথবা অনলাইন অফার ফি ৳ ৫৯৯ (১ম ২০ জন অফার, নিয়মিত ৳ ৭৯৯), রেফারেন্স: BCS। সেন্ড মানির পর স্ক্রিনশট আপলোড করুন।"
+    instructions: "bKash অ্যাপ বা *247# ডায়াল করে Send Money করুন: 01675226753 নম্বরে। অফলাইন ভর্তি ফি ৳ ১৪৯৯ (অফার সমাপ্ত, ৫৪+ জন ভর্তি) অথবা অনলাইন ভর্তি ফি ৳ ৭৯৯ (অফার সমাপ্ত, ৩২+ জন ভর্তি), রেফারেন্স: BCS। সেন্ড মানির পর স্ক্রিনশট আপলোড করুন।"
   },
   cash: {
     title: "Cash Payment (ক্যাশ পেমেন্ট)",
     type: "অফলাইন চকবাজার ক্যাম্পাস / প্রতিনিধি",
-    instructions: "আমাদের মতি টাওয়ার, চকবাজার অফিসে বা আমাদের কোনো প্রতিনিধির নিকট সরাসরি ক্যাশ টাকা (অফলাইন ৳ ১৪৯৯ বা অনলাইন ৳ ৫৯৯) জমা দিয়ে থাকলে, যিনি টাকা গ্রহণ করেছেন তার নাম লিখুন।"
+    instructions: "আমাদের মতি টাওয়ার, চকবাজার অফিসে বা আমাদের কোনো প্রতিনিধির নিকট সরাসরি ক্যাশ টাকা (অফলাইন ৳ ১৪৯৯ বা অনলাইন ৳ ৭৯৯) জমা দিয়ে থাকলে, যিনি টাকা গ্রহণ করেছেন তার নাম লিখুন।"
   }
 };
 

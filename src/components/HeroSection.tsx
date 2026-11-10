@@ -126,21 +126,21 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                   </div>
 
                   <div className="mt-3">
-                    <div className="text-[11px] text-slate-300 line-through">
-                      মূল ফি: ৳ ৭৯৯/-
+                    <div className="text-[11px] text-slate-400">
+                      মূল ভর্তি ফি:
                     </div>
                     <div className="flex items-baseline gap-2 mt-0.5">
                       <span className="text-2xl sm:text-3xl font-black font-display text-white font-mono-numbers">
-                        ৳ ৫৯৯/-
+                        ৳ ৭৯৯/-
                       </span>
-                      <span className="text-[11px] font-bold text-emerald-300 bg-emerald-950/90 px-2 py-0.5 rounded border border-emerald-500/40">
-                        ৳ ২০০ ছাড়
+                      <span className="text-[10px] font-bold text-amber-300 bg-amber-950/90 px-2 py-0.5 rounded border border-amber-500/40">
+                        অফার সমাপ্ত
                       </span>
                     </div>
                   </div>
 
-                  <div className="mt-2 text-xs font-bold text-amber-300 flex items-center gap-1">
-                    <span>⚡ ১ম ২০জনের জন্য ৫৯৯/- অফার চলছে!</span>
+                  <div className="mt-2 text-xs font-bold text-slate-300 flex items-center gap-1">
+                    <span>⚠️ অফার শেষ (৩২+ জন ভর্তি সম্পন্ন)</span>
                   </div>
                   <div className="mt-1 text-[11px] text-slate-300 leading-tight">
                     মোবাইল/ল্যাপটপে লাইভ পরীক্ষা, ডিজিটাল পিডিএফ প্রশ্ন ও সল্যুশন
@@ -161,7 +161,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 </div>
                 <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
                   <div
-                    className="bg-gradient-to-r from-cyan-500 via-blue-600 to-emerald-600 h-2 rounded-full w-[54%]"
+                    className="bg-gradient-to-r from-cyan-500 via-blue-600 to-emerald-600 h-2 rounded-full w-[86%]"
                   />
                 </div>
               </div>
@@ -177,7 +177,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 <span className="flex items-center gap-2">
                   <span>REGISTER NOW</span>
                   <span className="bg-white/20 text-white text-xs px-2 py-0.5 rounded font-mono-numbers font-extrabold">
-                    অফলাইন ৳ ১৪৯৯ | অনলাইন ৳ ৫৯৯
+                    অফলাইন ৳ ১৪৯৯ | অনলাইন ৳ ৭৯৯
                   </span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </span>

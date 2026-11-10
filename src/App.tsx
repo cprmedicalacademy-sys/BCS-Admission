@@ -166,10 +166,10 @@ export default function App() {
       <aside aria-label="Quick Registration" className="lg:hidden fixed bottom-0 left-0 right-0 z-30 p-2.5 bg-white/95 backdrop-blur-md border-t border-sky-100 shadow-xl flex items-center justify-between gap-3 no-print">
         <div className="pl-1">
           <div className="text-[10px] text-emerald-800 font-bold uppercase tracking-wider">
-            Special BCS (৫৪ জন ভর্তি)
+            Special BCS (৮৬+ জন ভর্তি)
           </div>
-          <div className="text-sm font-black text-blue-950 font-mono-numbers">
-            ৳ ১৪৯৯/-
+          <div className="text-xs font-black text-blue-950 font-mono-numbers">
+            অফলাইন ৳১৪৯৯ · অনলাইন ৳৭৯৯
           </div>
         </div>
 
@@ -177,7 +177,7 @@ export default function App() {
           onClick={handleRegisterClick}
           className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold text-xs shadow-md transition-all duration-200 active:scale-95 cursor-pointer whitespace-nowrap"
         >
-          Register Now · ৳১৪৯৯
+          Register Now
         </button>
       </aside>
 
